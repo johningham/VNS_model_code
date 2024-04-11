@@ -1,4 +1,4 @@
-function [p] = readDefaultParamsSimple()
+function [p] = read_default_params()
 
 
     % default connectivity parameters

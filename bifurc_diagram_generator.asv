@@ -32,8 +32,8 @@ weights = 0.01;
 % single composite diagram, using the default values for the paper. Parts
 % such a diagram were used to form the majority of Fig.2
 
-ex_min = -5; 
-ex_max = 5; 
+ex_min = -4; 
+ex_max = 6; 
 ex_step = 0.5; 
 
 inh_min = -8; 
