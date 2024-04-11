@@ -242,7 +242,7 @@ for lix = 1:listLength % (substitute for loop if not using parallelisation)
         % Analysis of segment (euclidean distances, moving averages, pruning, thresholding,
         % coding):    
         % get euclidean distances...
-        eucs = Eucliser2(stitched, eucWeights, exactFP);
+        eucs = eucliser(stitched, eucWeights, exactFP);
         
         % get moving averages
         smooth_eucs = movmean(eucs,wyndoh);

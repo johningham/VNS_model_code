@@ -155,7 +155,7 @@ compositeSeries = cat(1,compositeSeries,u);
 LFP = mean(compositeSeries(:,1:2),2);
 
 % calculate euclidean distance (using freestanding function)
-eucs = Eucliser2(compositeSeries, p.eucWeights, exactFP);
+eucs = eucliser(compositeSeries, p.eucWeights, exactFP);
 
 % get moving averages
 smooth_eucs = movmean(eucs,wyndoh);

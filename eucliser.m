@@ -1,4 +1,4 @@
-function eucvec = Eucliser2(u, euc_weights, FixedPoint)
+function eucvec = eucliser(u, euc_weights, FixedPoint)
 % can selectively calculate Euclidean distance from different combinations
 % of dimensions
     diffs = u - FixedPoint;
