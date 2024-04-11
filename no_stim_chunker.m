@@ -1,61 +1,8 @@
-% This code allows parameter sweeps in two dimensio
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Old comments for historical context only.
-
-
-% We have gutted the previous code, stepping back from previous
-% vectorisation due to RAM constraints. Here we will generate tuples of
-% parameters in a list to run through the parfor loop one at at time. As
-% such we will be reverting to the functions used in previous code.
-%
-% run_fullvec_parfor_flexi_chunker.m is developed from below with aim of
-% allowing specification of parameter and values both inside vectorised
-% code ("p.inner_guest_param / p.inner_param_values') and the outside in
-% the parfor loop ("p.outer_param / p.outer_param_values')
-%
-% NOTE!: I have gone through this code, and the relevant assocated
-% functions (VNSfn_fully_vec and fully_vectorised_eulersolver) and modified
-% the names of all arrays of 3 dimensions or more. The capital letters at
-% the end refer to their dimensions. 
-% T - 'Time' (by step)
-% O - 'Outer' ('...parameter', ie the one in the parfor loop)
-% E - 'Epochs'(mainly just when collecting initial states)
-% N - 'Noise' ('...values' - permanent fixture of the vectorised code)
-% I - 'Inner' ('...parameter' - in the vectorise code)
-% R - 'Region' ('...of the brain', really population, always 22 of them)
-% run_fullvec_parfor_chunker.m is developed from 
-% run_fully_vectorised_chunker.m with a view to wrapping eveything in an
-% external parfor loop. This is runs, but is not yet doing anything useful
-% run_fully_vectorised_chunker.m replaces run_parallel_chunker for now and
-% applies, as its name suggests, a fully vectorised approach (with no
-% parfor loops). Will need testing on simple scales to ensure efficiency.
-%
-% run_parallel_chunker takes run_chunker_bitshift and optimizes it for
-% parallelization on Rocket. 
-% Should allow for sweeps of multiple values of given parameter(s).
-% Save relevant workspace variables (results, initial states, parameters
-% etc) to allow for reconstruction of sections of time series (to be done
-% in different code).
-%
-% run_chunker_bitshift.m
-% This evolution of run_ultimateVNS_chunker.m attempts to use an optimised
-% algorithm for identifying runs of seizures using bitshifting. 
-%
-% run_ultimateVNS_chunker.m takes run_ultimateVNS.m and:
-%   1) Runs consecutive RNG seeds.
-%   2) Detects seizures in them.
-%   3) Codes these in a space-efficient format.
-%   4) Concatenates the results over long time periods.
-%   5) Also stores an array of initial states of each chunk to aid 
-%      recreation of segments.
-%
-% run_ultimateVNS.m is a modestly titled program that initiates the code
-% that performs multiple runs of stochastic system, comparing pairs of 
-% idential initial conditions and seeded random noise with and without VNS.
-
-%%
-
+% This code uses the noisy version of the model, but without any simulated 
+% VNS. It allows two dimensional parameter sweeps for any combination of
+% connection weights or background activity parameters. It was used with 
+% the settings below to perform the one dimensional sweep of NTS_py seen 
+% in Fig 3A of the paper. 
 
 close all
 clear
@@ -66,14 +13,12 @@ clear
 tic
 
 paramOne = 21; % single value for p.h(i) or pair ([i,j]) for p.w(i,j)
-% (usually the NTS(Ex) offset -- p.h(21) and its values)
-% paramOneValues = -1:0.05:0; % wide, narrow, zoomed param sweep window
-% paramOneValues = -0.35:0.05:-0.1; % for noise sweeps
-paramOneValues = 0; % specify single value when not wishing to sweep this parameter
+% (usually the NTS(Py) offset -- p.h(21) and its values)
+% paramOneValues = -1:0.01:0; % what was used in the paper
+paramOneValues = -1:0.1:0; % courser intervals to run faster.
 
 paramTwo = 22; % single value for p.h(i) or pair ([i,j]) for p.w(i,j)
 % (usually the NTS(Inh) offset -- p.h(22) and its values)
-% paramTwoValues = -2:0.05:2; % wide, narrow, zoomed param sweep window
 paramTwoValues = 0; % specify single value when not wishing to sweep this parameter
 
 nParamOne = length(paramOneValues);
@@ -81,11 +26,10 @@ nParamTwo = length(paramTwoValues);
 
 % Other important settings go here:
 
-dt = 0.0001; % (timestep: 0.0001 used throughout paper)
+dt = 0.0001; % (timestep: 0.0001 - 100microseconds - used throughout paper)
 endtime = 100; % (simulated seconds for each section of epoch)  
 % (NOTE cannot compare runs runs where sections are different lengths as rng
-% seeding will be different!!
-% 100s used throughout paper)
+% seeding will be different!! 100s used throughout paper)
 
 % set number of epochs
 % nRuns = 100; % what was used for the examples in the paper.
@@ -131,8 +75,14 @@ p.w(4,15) = 0.01; % default = 0!
 % p.h(1) = -0.3; % default = -0.35
 p.h(21) = -1.5; % default = -0.35
 
+% (then ammend any weights, offsets, noise scaling etc)
+p.w(4,21) = 0.08; % default = 0.08, but connectivity.mat value is 0.01
+p.w(4,15) = 0.01; % default = 0.01, but connectivity.mat value is ZERO
+ 
+
+
 % templates for noiseINJECTED
-noiseEX = repmat([1,0],1,11); % this is what is used in the VNS_noisy version.
+noiseEX = repmat([1,0],1,11); 
 noiseON = ones(1,22);
 noiseOFF = zeros(1,22);
 noiseNTS = noiseOFF; noiseNTS(21) = 1;
@@ -144,11 +94,11 @@ noiseCustom3 = [1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0];
 
 % Noise settings...
 nNoises = 1; % (sets the number of different noise levels that will be used)
-noiseMaxScaler = 0.4; % (0.4 default for now)
+noiseMaxScaler = 0.72;
 noiseMinScaler = 0;
-% noiseMaxScaler = 0; % (for testing)
-% noiseCHOICE = noisePY;
-noiseCHOICE = noiseTC; % (used in paper)
+% This is set to produce the single noise scaler (effectively the standard
+% deviation of the noise) of 0.72 that is used in the paper.
+noiseCHOICE = noisePY;
 
 % allow for single value of noise scaler (equal to Max)
 if nNoises == 1
@@ -334,26 +284,12 @@ for lix = 1:listLength % (substitute for loop if not using parallelisation)
         % update seizure flag            
         seizureFlag = isitoverthrshld(end);
 
-
-%**************************************************************************
-%  FOR DEBUGGING ONLY!!! (Only in for-loop! Does not work in parfor!)
-%     figure 
-%     hold on
-%     testS1 = (stitched(:,1) + stitched(:,2)) /2;
-%     plot(testS1(:,1))
-%     plot(eucs(:,1))
-%     plot(smooth_eucs(:,1))
-%     yline(threshold)
-%     xline(halfwindow)
-%     xline(length(stitched)- halfwindow)      
-%**************************************************************************
-
     end % (of seed/epoch)
 
-    % assemble results here!!
+    % results assembled here
     linearResults{lix} = localResult;
 
-end % (of parfor loop!)
+end % (of parfor loop)
 
 % Fold up linearResults...    
 foldedResults(:) = linearResults(:);
