@@ -356,7 +356,7 @@ for lix = 1:listLength % (substitute for loop if not using parallelisation)
 end % (of parfor loop!)
 
 % Fold up linearResults...    
-foldedResults(:) = linearResults(:); % (yes, it's really that simple!!)
+foldedResults(:) = linearResults(:);
 
 % and initStates...
 initStatesFolded(:) = initStates(:); 
@@ -379,10 +379,11 @@ p.endtime = endtime;
 p.foldedResults = foldedResults;
 p.init_states = initStatesFolded;
 
-p.title = strcat("VNS_linear_output_", string(floor((now-738000)*1000)));
+p.title = strcat("VNS_no_stim_output_", string(floor((now-738000)*1000)));
 % (p.title is a general stem for for related plots etc. Therefore saved with data)
 fulltitle = [p.title, '.mat'];
 p.runUnder = mfilename;
 p.finishedAt = datetime;
 
-save(p.title,'p')
+% uncomment to allow output file to be saved
+% save(p.title,'p')
