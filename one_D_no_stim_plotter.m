@@ -1,6 +1,6 @@
 clear
 
-load('VNS_linear_output_1146671.mat')
+load('VNS_no_stim_output_1146671.mat')
 
 close all
 
