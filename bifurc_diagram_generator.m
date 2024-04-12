@@ -43,8 +43,8 @@ inh_step = 1;
 %% ************************************************************************
 
 % Get standard parameters and tweak as needed...
-% read_default_params();
-[p.w,p.h,p.s,p.AffIn,p.tau] = readDefaultVNSParams();
+p = read_default_params();
+
 p.h(3) = -2; % change from default for bistable ODE45
 base_params = p; % save copy to reset from as needed.
 
