@@ -1,7 +1,8 @@
 function [w,h,s,AffIn,tau] = readDefaultVNSParams()
 
 
-    % default connectivity parameters
+    % Added back to make bifurc parameter work. Will hoepfully be able to
+    % get away with a single parameter reader.
     
     % weights needs to be a matrix of regionxregion with entries only where
     % there are connections present
