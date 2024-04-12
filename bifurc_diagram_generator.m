@@ -36,9 +36,9 @@ ex_min = -5;
 ex_max = 5; 
 ex_step = 0.5; 
 
-inh_min = -8; 
-inh_max = 2; 
-inh_step = 0.5; 
+inh_min = -0.7; 
+inh_max = 1; 
+inh_step = -0.7; 
 
 %% ************************************************************************
 
@@ -237,17 +237,6 @@ for wix = 1:length(weights) % (everything goes inside this loop!)
 end
 
 
-function loc = sort_paths()
-    % Determine system to ensure figures correctly saved (all rather John
-    % centric)
-    if ismac
-        macbac()
-        loc = '~/Library/CloudStorage/OneDrive-NewcastleUniversity/PhD/VNS/Bifurcation_Plots/';
-    elseif ispc
-        pcbac()
-        loc = 'C:\Users\b9063306\OneDrive - Newcastle University\PhD\VNS\Bifurcation_Plots\';
-    end
-end
 
 
 
