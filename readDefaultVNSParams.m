@@ -1,4 +1,4 @@
-function [p] = readDefaultParamsSimple()
+function [w,h,s,AffIn,tau] = readDefaultVNSParams()
 
 
     % default connectivity parameters
@@ -11,8 +11,8 @@ function [p] = readDefaultParamsSimple()
     % default static input levels
     h(1) = -.35;      % S1 PY
     h(2) = -3.4;      % S1 IN
-    h(3) = -2.05;     % TC, -2 for bistable for ode45; -2.2 for excitable for ode45. -2.05 for full model
-    h(4) = -12;       % RE -5 in default model, -12 for full model
+    h(3) = -2.05;     % TC, 
+    h(4) = -12;       % RE 
     h(5:2:21) = h(1); % set all PYs to the same base input by default for now.
     h(6:2:22) = h(2); % set all INs to the same base input by default for now.
     
@@ -51,8 +51,5 @@ function [p] = readDefaultParamsSimple()
    tau(21)=1*26;       %
    tau(22)=1.25*26;    %
    
-   p.w = w;
-   p.h = h;
-   p.s = s;
-   p.AffIn = AffIn;
-   p.tau = tau;
+
+   

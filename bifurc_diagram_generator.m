@@ -4,7 +4,7 @@
 
 close all
 clear
-loc = sort_paths(); % Determine system to ensure figures correctly saved
+%loc = sort_paths(); % Determine system to ensure figures correctly saved
 
 %% ************************TWEAK VARIABLES HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -43,7 +43,8 @@ inh_step = 0.5;
 %% ************************************************************************
 
 % Get standard parameters and tweak as needed...
-[p.w,p.h,p.s,p.AffIn,p.tau] = read_default_params();
+% read_default_params();
+[p.w,p.h,p.s,p.AffIn,p.tau] = readDefaultVNSParams();
 p.h(3) = -2; % change from default for bistable ODE45
 base_params = p; % save copy to reset from as needed.
 
@@ -55,14 +56,14 @@ inhs = inh_min:inh_step:inh_max;
 ex_range = ex_max:-0.01:ex_min; 
 inh_range = inh_max:-0.01:inh_min;
 
-% Ensure the existence of the folders we will need.
-fldr = [loc, blurb];
-mkdir(fldr) % top level. composite plots here as well as subdirectories
-cd(fldr)
-mkdir mat % contained in <fldr>. composite plots saved here as matlab figs
-mkdir parts % also in <fldr>. individual plots that make the composite plots
-cd parts 
-mkdir mat % contained in <fldr>\parts\. matlab fig versions of individual plots
+% % Ensure the existence of the folders we will need.
+% fldr = [loc, blurb];
+% mkdir(fldr) % top level. composite plots here as well as subdirectories
+% cd(fldr)
+% mkdir mat % contained in <fldr>. composite plots saved here as matlab figs
+% mkdir parts % also in <fldr>. individual plots that make the composite plots
+% cd parts 
+% mkdir mat % contained in <fldr>\parts\. matlab fig versions of individual plots
 
 for wix = 1:length(weights) % (everything goes inside this loop!)
 
@@ -83,14 +84,14 @@ for wix = 1:length(weights) % (everything goes inside this loop!)
         filename = ['ExSweep', blurb, '=', num2str(connection_wt), ' NTS(inh)=', num2str(NTS_inh)];
         title(filename) % (just for its individual existence)
     
-        % (needs saving to parts and parts\mat!)
-        oldFolder = cd(fldr);
-        cd parts
-        saveas(fig,[filename, '.png'])
-        cd mat
-        saveas(fig,[filename, '.fig'])
-        cd(oldFolder) 
-        close all
+        % % (needs saving to parts and parts\mat!)
+        % oldFolder = cd(fldr);
+        % cd parts
+        % saveas(fig,[filename, '.png'])
+        % cd mat
+        % saveas(fig,[filename, '.fig'])
+        % cd(oldFolder) 
+        % close all
     end
     p.h(22) = base_params.h(22);
 
@@ -107,14 +108,14 @@ for wix = 1:length(weights) % (everything goes inside this loop!)
         filename = ['InhSweep', blurb, '=', num2str(connection_wt), ' NTS(ex)=', num2str(NTS_ex)];
         title(filename) % (just for its individual existance)
     
-        % (needs saving to parts and parts\mat!)
-        oldFolder = cd(fldr);
-        cd parts
-        saveas(fig,[filename, '.png'])
-        cd mat
-        saveas(fig,[filename, '.fig'])
-        cd(oldFolder)
-        close all
+        % % (needs saving to parts and parts\mat!)
+        % oldFolder = cd(fldr);
+        % cd parts
+        % saveas(fig,[filename, '.png'])
+        % cd mat
+        % saveas(fig,[filename, '.fig'])
+        % cd(oldFolder)
+        % close all
     end
     p.h(21) = base_params.h(21);
     
@@ -138,24 +139,24 @@ for wix = 1:length(weights) % (everything goes inside this loop!)
             filename2 = ['InhSweep', blurb, '=', num2str(connection_wt),...
                 ' NTS(ex)=', num2str(NTS_ex) '.fig'];
 
-            oldFolder = cd(fldr);
-            cd parts
-            cd mat
-
-            openfig(filename1);
-            figure(1)
-            ax1 = subplot(2, 2, 1, gca);
-            title('')
-            xline(NTS_ex, 'b--', {'current value    '})
-
-            openfig(filename2);
-            figure(2)
-            ax2 = subplot(2, 2, 2, gca);
-            title('')
-            ylabel('')
-            xline(NTS_inh, 'b--', {'current value    '})
-
-            cd(oldFolder)
+            % oldFolder = cd(fldr);
+            % cd parts
+            % cd mat
+            % 
+            % openfig(filename1);
+            % figure(1)
+            % ax1 = subplot(2, 2, 1, gca);
+            % title('')
+            % xline(NTS_ex, 'b--', {'current value    '})
+            % 
+            % openfig(filename2);
+            % figure(2)
+            % ax2 = subplot(2, 2, 2, gca);
+            % title('')
+            % ylabel('')
+            % xline(NTS_inh, 'b--', {'current value    '})
+            % 
+            % cd(oldFolder)
             
 
             % DO CORESPONDING TIME SERIES PLOTS.
