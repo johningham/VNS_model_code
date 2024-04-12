@@ -37,8 +37,8 @@ ex_max = 5;
 ex_step = 0.5; 
 
 inh_min = -0.7; 
-inh_max = 1; 
-inh_step = -0.7; 
+inh_max = -0.7; 
+inh_step = 1; 
 
 %% ************************************************************************
 
@@ -104,7 +104,8 @@ for wix = 1:length(weights) % (everything goes inside this loop!)
         fig = Bifurcation_VNS_takes_params(p, param_to_change, paramrange, 2);
         ylabel('Min, Max S1') 
         xlabel('NTS Inh input')
-        fig.XLim = [inh_min, (inh_max + (inh_max - inh_min)*0.1)]; % (add a bit of space on the right)
+        fig.XLim = [inh_min, (inh_max + (inh_max - inh_min)*0.1) + 0.0001]; 
+        % (add a bit of space on the right, and avoids error if min+max)
         filename = ['InhSweep', blurb, '=', num2str(connection_wt), ' NTS(ex)=', num2str(NTS_ex)];
         title(filename) % (just for its individual existance)
     
