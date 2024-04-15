@@ -1,17 +1,10 @@
 % This code analyses the deterministic version of the model. It allows
 % automated generation of sets of composite plots for two-dimensional 
 % sweeps of the excitatory and inhibitory NTS background values, and to
-% perform these for a series of values for different conection weights.
-%
-% As set up, the code takes some considerable time to generate a set of
-% composite figures for all cominations of 21 excitatory and 21 inhibitory
-% NTS values, a total of 441. It performs these for only a single value of
-% the NTS>TC connection weight, but more could be specified. The run time
-% for this task is in the order of
+% perform these for a series of values for different conection weights
 
 close all
 clear
-% set location for saved output
 loc = '/Users/john/Documents/VNS_output/composite_bifurc_figs';
 %% ************************TWEAK VARIABLES HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -52,14 +45,14 @@ inhs = inh_min:inh_step:inh_max;
 ex_range = ex_max:-0.01:ex_min; 
 inh_range = inh_max:-0.01:inh_min;
 
-% Ensure the existence of the folders we will need.
-fldr = [loc, blurb];
-mkdir(fldr) % top level. composite plots here as well as subdirectories
-cd(fldr)
-mkdir mat % contained in <fldr>. composite plots saved here as matlab figs
-mkdir parts % also in <fldr>. individual plots that make the composite plots
-cd parts 
-mkdir mat % contained in <fldr>\parts\. matlab fig versions of individual plots
+% % Ensure the existence of the folders we will need.
+% fldr = [loc, blurb];
+% mkdir(fldr) % top level. composite plots here as well as subdirectories
+% cd(fldr)
+% mkdir mat % contained in <fldr>. composite plots saved here as matlab figs
+% mkdir parts % also in <fldr>. individual plots that make the composite plots
+% cd parts 
+% mkdir mat % contained in <fldr>\parts\. matlab fig versions of individual plots
 
 for wix = 1:length(weights) % (everything goes inside this loop!)
 
@@ -80,14 +73,14 @@ for wix = 1:length(weights) % (everything goes inside this loop!)
         filename = ['ExSweep', blurb, '=', num2str(connection_wt), ' NTS(inh)=', num2str(NTS_inh)];
         title(filename) % (just for its individual existence)
     
-        % (needs saving to parts and parts\mat!)
-        oldFolder = cd(fldr);
-        cd parts
-        saveas(fig,[filename, '.png'])
-        cd mat
-        saveas(fig,[filename, '.fig'])
-        cd(oldFolder) 
-        close all
+        % % (needs saving to parts and parts\mat!)
+        % oldFolder = cd(fldr);
+        % cd parts
+        % saveas(fig,[filename, '.png'])
+        % cd mat
+        % saveas(fig,[filename, '.fig'])
+        % cd(oldFolder) 
+        % close all
     end
     p.h(22) = base_params.h(22);
 
