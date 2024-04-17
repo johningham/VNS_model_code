@@ -339,7 +339,6 @@ p = rmfield(p,'noisevecs');
 p = rmfield(p,'stimVal');
 p = rmfield(p,'h');
 p = rmfield(p,'tau');
-p = rmfield(p,'AffIn');
 
 % and add important data...
 p.n_runs = nRuns;

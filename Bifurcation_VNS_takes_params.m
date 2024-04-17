@@ -63,7 +63,7 @@ for rr = 1:repeats % 1 by default, but can loop for multiple start points by inc
 
     for i=1:length(paramrange)
         
-        if length(param_to_change)==1 %  if it is a scalar then it is a static input
+        if isscalar(param_to_change) %  if it is a scalar then it is a static input
             p.h(param_to_change) = paramrange(i); % need to work out how to change this in a sensible way
         else % it should be a weight in the form [x,y]
             p.w(param_to_change) = paramrange(i);
@@ -126,7 +126,7 @@ for rr = 1:repeats % 1 by default, but can loop for multiple start points by inc
     
     for i=1:length(params_b)
         
-        if length(param_to_change)==1 %  if it is a scalar then it is a static input
+        if isscalar(param_to_change) %  if it is a scalar then it is a static input
             p.h(param_to_change) = params_b(i); % need to work out how to change this in a sensible way
         else % it should be a weight in the form [x,y]
             p.w(param_to_change) = params_b(i);

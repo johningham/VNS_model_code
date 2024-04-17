@@ -1,29 +1,32 @@
 function [p] = read_default_params()
 
-
-    % default connectivity parameters
-    
-    % weights needs to be a matrix of regionxregion with entries only where
-    % there are connections present
+    % Default connectivity parameters
+    % (weights needs to be a matrix of region x region with entries only where
+    % there are connections present)
     struct = load('VNSconnectivity.mat');
     w = struct.mat;
 
-    % default static input levels
+    % note that weights between TC and RE regions are not included above.
+    % These are handled separately below...
+    p.TC2RE = 0.6;
+    p.RE2TC = 0.2;
+    p.RE2RE = 10.5;
+
+
+    % Default static input levels
     h(1) = -.35;      % S1 PY
     h(2) = -3.4;      % S1 IN
-    h(3) = -2.05;     % TC, -2 for bistable for ode45; -2.2 for excitable for ode45. -2.05 for full model
-    h(4) = -12;       % RE -5 in default model, -12 for full model
-    h(5:2:21) = h(1); % set all PYs to the same base input by default for now.
-    h(6:2:22) = h(2); % set all INs to the same base input by default for now.
+    h(3) = -2;        % TC
+    h(4) = -12;       % RE 
+    h(5:2:21) = h(1); % set all other PYs to the same base input by default.
+    h(6:2:22) = h(2); % set all other INs to the same base input by default.
     
-    h=h'; % flip to column vector
+    h=h'; % Flip to column vector
     
     s=2.8;     % thalamic input multiplier
     a=1;       % thalamic tau (time delay) multiplier
-    AffIn = zeros(1,22);
-    AffIn(21) = 1;
-    % repmat([0.1,0],1,11); % Afferent input scaler,
-    % for the noisy sim setting the default to 0.1* input to excitatory populations and 0*input to inhibitory
+    % AffIn = zeros(1,22);
+    % AffIn(21) = 1;
     % for the deterministic to replicate VNS Amari this will be all zeros
     % except for NTS excitatory which is set to 1.
         
@@ -54,5 +57,5 @@ function [p] = read_default_params()
    p.w = w;
    p.h = h;
    p.s = s;
-   p.AffIn = AffIn;
+   % p.AffIn = AffIn;
    p.tau = tau;

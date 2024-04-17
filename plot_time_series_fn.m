@@ -1,9 +1,6 @@
-% Code from 'plot_time_series.m' made into a function. Takes a set of
-% parameters and a set of initial conditions and returns figure showing a
-% section of time series after equilibrium reached.
-
-
 function fig = plot_time_series_fn(p, init_cond)
+% Takes a set of parameters and a set of initial conditions and returns 
+% figure showing a section of time series after equilibrium reached.
     
     % run model once after randomising to stabilise system
     [~,u]=ode45(@(t,u)VNS_vectorise(t,u,p),[0 200],init_cond); %background state

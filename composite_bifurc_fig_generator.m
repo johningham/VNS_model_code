@@ -19,7 +19,8 @@ weights = 0.01;
 % (lists or ranges may be used to scan over a number of different values of
 % the desired connection weight)
 
-% Below is an example of an extensive range of parameter values
+% Below is an example of an extensive range of parameter values for
+% background inputs to both excitatory and inhibitory populations of NTS.
 ex_min = -5; 
 ex_max = 5; 
 ex_step = 0.5; 
