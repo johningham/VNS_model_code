@@ -1,12 +1,13 @@
 function [p] = read_default_params()
 
-    % Default connectivity parameters
-    % (weights needs to be a matrix of region x region with entries only where
-    % there are connections present)
+    % Sets the default connectivity parameters between regions. 
+    % (Weights needs to be a matrix of region x region with entries only 
+    %  where there are connections present.)
     struct = load('VNSconnectivity.mat');
     w = struct.mat;
 
-    % note that weights between TC and RE regions are not included above.
+    % note that weights between TC and RE regions are not included above,
+    % due to a different set of equations being used. 
     % These are handled separately below...
     p.TC2RE = 0.6;
     p.RE2TC = 0.2;

@@ -12,8 +12,8 @@ function dudt=VNS_vectorise(t,u,p)
 
     % additional inputs for the thalamic areas
     thal = zeros(22,1);
-    thal(3) = -0.6*(p.s*u(4)+.5);
-    thal(4) = 10.5*(p.s*u(3)+.5) -0.2*(p.s*u(4)+.5);
+    thal(3) = -p.TC2RE*(p.s*u(4)+.5);
+    thal(4) = p.RE2RE*(p.s*u(3)+.5) -p.RE2TC*(p.s*u(4)+.5);
     
     % change in population outputs over time
     dudt = (p.h - u + p.w * (1./(1+250000.^-(u))) + thal).*p.tau';

@@ -19,10 +19,7 @@ function fig = Bifurcation_VNS_takes_params(p,param_to_change,paramrange,repeats
 
 ignore4time = 6; % sets time after which things get measured
 
-if nargin < 3
-    % orig = 0;
-    repeats = 1;
-elseif nargin < 4
+if nargin < 4
     repeats = 1;
 end
 
