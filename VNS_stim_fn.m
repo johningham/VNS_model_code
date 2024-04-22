@@ -30,11 +30,12 @@ p.h(22) = p.h(22) + p.stimVal(2)*stimOn; % Inh
 
 % additional inputs for the thalamic areas
 thal = zeros(22,1);
-thal(3) = -0.6*(p.s*u(4)+.5);
-thal(4) = 10.5*(p.s*u(3)+.5) -0.2*(p.s*u(4)+.5);
+thal(3) = -p.TC2RE * (p.a * u(4) + p.b);
+thal(4) = p.RE2RE * (p.a * u(3) + p.b) - p.RE2TC * (p.a * u(4) + p.b);
 
 % stochastic version (using indexing of passed noise vector):
-ix = int32((t+p.dt)/p.dt);
-dudt = (p.h - u + p.w * (1./(1+250000.^-(u))) + thal + p.noisevecs(ix,:)').*p.tau';
-
+ix = int32((t + p.dt) / p.dt);
+dudt = (p.h - u + p.w * (1 ./ (1 + p.epsilon .^ -(u))) + thal ...
+    + p.noisevecs(ix,:)') .* p.tau';
 end
+

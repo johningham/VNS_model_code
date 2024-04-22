@@ -12,6 +12,6 @@ function dudt=VNS_vectorise(~,u,p)
     thal(4) = p.RE2RE * (p.a * u(3) + p.b) -p.RE2TC * (p.a * u(4) + p.b);
      
     % change in population outputs over time
-    dudt = (p.h - u + p.w * (1 ./ (1+p.epsilon .^ -(u))) + thal) .* p.tau';
+    dudt = (p.h - u + p.w * (1 ./ (1 + p.epsilon .^ -(u))) + thal) .* p.tau';
 
 end
