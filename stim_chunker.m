@@ -29,7 +29,7 @@ nExStims = 76;
 
 maxInStim = 0; 
 nInStims = 1;
-% (In this example, as in the paper, there is not stimulation applied to
+% (In this example, as in the paper, there is no VNS stimulation applied to
 % the inhibitory population of the NTS)
 
 % Background NTS(Ex) and (Inh) input values before stim added
@@ -74,7 +74,7 @@ dt = 0.0001; % (timestep)
 eucWeights = [1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]; % (just S1)
 
 % width of window for moving average calculations
-windowSecs = 2; % needs to be less than endtime (not much sense if not anyway)
+windowSecs = 2; % needs to be less than endtime
 halfwindow = floor(windowSecs/(2*dt));
 wyndoh = halfwindow*2 +1; % easier if consistently an odd integer
 
@@ -133,7 +133,6 @@ end
 
 p.noiseCHOICE = noiseCHOICE;
 p.noiseScalers = noiseScalers;
-
 
 % Initial condition sets:
 % (S1_PY, SI_IN, TC, RE, INS_EX, INS_IN, ACC_EX, ACC_IN, PFC_EX, PFC_IN, 
@@ -303,20 +302,6 @@ for lix = 1:listLength % replace with FOR if not parallelising
         % update seizure flag            
         seizureFlag = isitoverthrshld(end);
 
-
-%**************************************************************************
-%  FOR DEBUGGING ONLY!!! (Only in for-loop! Does not work in parfor!)
-%     figure 
-%     hold on
-%     testS1 = (stitched(:,1) + stitched(:,2)) /2;
-%     plot(testS1(:,1))
-%     plot(eucs(:,1))
-%     plot(smooth_eucs(:,1))
-%     yline(threshold)
-%     xline(halfwindow)
-%     xline(length(stitched)- halfwindow)      
-%**************************************************************************
-
     end % (of seed/epoch)
 
     % assemble results here!!
@@ -325,20 +310,19 @@ for lix = 1:listLength % replace with FOR if not parallelising
 end % (of parfor loop!)
 
 % Fold up linearResults...    
-foldedResults(:) = linearResults(:); % (yes, it's really that simple!!)
+foldedResults(:) = linearResults(:);
 
 % and initStates...
 initStatesFolded(:) = initStates(:); 
 
-p.tock = toc
+p.tock = toc;
+toc
 
 % Save the data tidily:
 
 % tidy up bloat...
 p = rmfield(p,'noisevecs');
 p = rmfield(p,'stimVal');
-p = rmfield(p,'h');
-p = rmfield(p,'tau');
 
 % and add important data...
 p.n_runs = nRuns;
