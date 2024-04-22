@@ -24,39 +24,43 @@ function [p] = read_default_params()
     
     h=h'; % Flip to column vector
     
-    s=2.8;     % thalamic input multiplier
-    a=1;       % thalamic tau (time delay) multiplier
+    a=2.8;       % thalamic linear activation function gradient
+    b=0.5;       % thalamic linear activation function y-intercept
+    epsilon = 250000; 
     % AffIn = zeros(1,22);
     % AffIn(21) = 1;
     % for the deterministic to replicate VNS Amari this will be all zeros
     % except for NTS excitatory which is set to 1.
         
    % Time scale parameters
-   tau(1)=1*26;       %
-   tau(2)=1.25*26;    %
-   tau(3)=.1*a*26;    %
-   tau(4)=.1*a*26;    %
-   tau(5)=1*26;       %
-   tau(6)=1.25*26;    %
-   tau(7)=1*26;       %
-   tau(8)=1.25*26;    %
-   tau(9)=1*26;       %
-   tau(10)=1.25*26;    %
-   tau(11)=1*26;       %
-   tau(12)=1.25*26;    %
-   tau(13)=1*26;       %
-   tau(14)=1.25*26;    %
-   tau(15)=1*26;       %
-   tau(16)=1.25*26;    %
-   tau(17)=1*26;       %
-   tau(18)=1.25*26;    %
-   tau(19)=1*26;       %
-   tau(20)=1.25*26;    %
-   tau(21)=1*26;       %
-   tau(22)=1.25*26;    %
+   tau(1) = 26;       
+   tau(2) = 32.5;    
+   tau(3) = 2.6;    
+   tau(4) = 2.6;    
+   tau(5) = 26;       
+   tau(6) = 32.5;    
+   tau(7) = 26;       
+   tau(8) = 32.5;    
+   tau(9) = 26;       
+   tau(10) = 32.5;    
+   tau(11) = 26;       
+   tau(12) = 32.5;    
+   tau(13) = 26;       
+   tau(14) = 32.5;    
+   tau(15) = 26;       
+   tau(16) = 32.5;    
+   tau(17) = 26;       
+   tau(18) = 32.5;    
+   tau(19) = 26;       
+   tau(20) = 32.5;    
+   tau(21) = 26;       
+   tau(22) = 32.5;    
+
    
    p.w = w;
    p.h = h;
-   p.s = s;
+   p.a = a;
+   p.b = b;
+   p.epsilon = epsilon;
    % p.AffIn = AffIn;
    p.tau = tau;
