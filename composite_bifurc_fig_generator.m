@@ -114,8 +114,8 @@ for wix = 1:length(weights) % (everything goes inside this loop!)
         % (component plots need saving to parts and parts/mat)
         cd ([fldr filesep 'parts'])
         saveas(fig,[filename, '.png'])
-        cd mat
         cd ([fldr filesep 'parts' filesep 'mat'])
+        saveas(fig,[filename, '.fig'])
         cd(oldFolder)
         close all
     end
