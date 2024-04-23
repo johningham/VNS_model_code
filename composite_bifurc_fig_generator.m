@@ -52,9 +52,10 @@ inhs = inh_min:inh_step:inh_max;
 ex_range = ex_max:-0.01:ex_min; 
 inh_range = inh_max:-0.01:inh_min;
 
-% **DEBUGGING!!!
-% ex_range = -0.9;
-% inh_range = -0.7;
+% REDEFINED FOR DEBUGGING PURPOSES ONLY!!!
+exes = -0.9;
+inhs = -0.7;
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Ensure the existence of the folders we will need.
 fldr = [save_path filesep blurb];
