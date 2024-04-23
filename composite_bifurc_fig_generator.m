@@ -53,13 +53,13 @@ ex_range = ex_max:-0.01:ex_min;
 inh_range = inh_max:-0.01:inh_min;
 
 % **DEBUGGING!!!
-ex_range = -0.9;
-inh_range = -0.7;
+% ex_range = -0.9;
+% inh_range = -0.7;
 
 % Ensure the existence of the folders we will need.
 fldr = [save_path filesep blurb];
-oldFolder = cd(fldr); % go to fldr and save current path.
 mkdir(fldr) % top level. composite plots here as well as subdirectories
+oldFolder = cd(fldr); % go to fldr and save current path.
 mkdir mat % contained in <fldr>. composite plots saved here as matlab figs
 mkdir parts % also in <fldr>. individual plots that make the composite plots
 cd parts 
@@ -86,14 +86,13 @@ for wix = 1:length(weights) % (everything goes inside this loop!)
         filename = ['ExSweep', blurb, '=', num2str(connection_wt), ' NTS(inh)=', num2str(NTS_inh)];
         title(filename) % (just for its individual existence)
     
-        % % (needs saving to parts and parts\mat!)
-        % oldFolder = cd(fldr);
-        % cd parts
-        % saveas(fig,[filename, '.png'])
-        % cd mat
-        % saveas(fig,[filename, '.fig'])
-        % cd(oldFolder) 
-        % close all
+        % (needs saving to parts and parts\mat!)
+        cd ([fldr filesep 'parts'])
+        saveas(fig,[filename, '.png'])
+        cd ([fldr filesep 'parts' filesep 'mat'])
+        saveas(fig,[filename, '.fig'])
+        cd(oldFolder)
+        close all
     end
     p.h(22) = base_params.h(22);
 
@@ -115,7 +114,7 @@ for wix = 1:length(weights) % (everything goes inside this loop!)
         cd ([fldr filesep 'parts'])
         saveas(fig,[filename, '.png'])
         cd mat
-        saveas(fig,[filename, '.fig'])
+        cd ([fldr filesep 'parts' filesep 'mat'])
         cd(oldFolder)
         close all
     end
