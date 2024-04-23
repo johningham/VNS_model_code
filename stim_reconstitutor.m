@@ -42,7 +42,7 @@ wyndoh = halfwindow*2 +1; % (easier if consistently an odd integer)
 clear("nStps")
 nStps = cast(p.nSteps,'double');
 
-leftEdge = startStep-startmargin; % (x-limits of plot)
+leftEdge = startStep - startmargin; % (x-limits of plot)
 rightEdge = endStep+endmargin;
 
 verystart = cast((startStep - startmargin - halfwindow),'double');
@@ -130,7 +130,8 @@ for seed = vsepoch:veepoch
     thisinit = initsER((seed),:);
 
     % send to solver
-    [~,u] = vectorised_eulersolver(@(t,u)VNS_stim_fn(t,u,p), thisinit, dt, endtime-dt);
+    [~,u] = vectorised_eulersolver(@(t,u)VNS_stim_fn(t,u,p), thisinit, ... 
+        dt, endtime-dt);
 
     % append result to long time series
     compositeSeries = cat(1,compositeSeries,u); 
@@ -146,7 +147,8 @@ p.noisevecs = randn(nStps, 22) .* p.AffIn; % (overwrites previous val)
 thisinit = compositeSeries(end,:);
 
 % send to solver
-[~,u] = vectorised_eulersolver(@(t,u)VNSfn_stoch_vec_Euler_stim(t,u,p), thisinit, dt, endtime-dt);
+[~,u] = vectorised_eulersolver(@(t,u)VNSfn_stoch_vec_Euler_stim(t,u,p), ...
+    thisinit, dt, endtime-dt);
 
 % append result to long time series
 compositeSeries = cat(1,compositeSeries,u); 
@@ -192,8 +194,6 @@ ylim([bottomEdge topEdge])
 f1 = gcf;
 f1.Position = [200 200 2000 700];
 
-% !!add param values to title on plot!!
-
 %% Plotting other regions
 stepsToPlot = size(seriesSteps,2);
 LFP_Ex = zeros(stepsToPlot, 11);
@@ -206,7 +206,8 @@ for i = 1:2:21
 end
 lineUpForMean = cat(3, LFP_Ex,LFP_In);
 LFPs = mean(lineUpForMean, 3);
-reg_name = ["S1","Thalamus","Insula","ACC","PFC","Amygdala","Hypothal","LC","DRN","PB","NST"];
+reg_name = ["S1","Thalamus","Insula","ACC","PFC","Amygdala","Hypothal", ...
+    "LC","DRN","PB","NST"];
 figure(2)
 % showing all regions, there are 11, but we are plotting the cortical S1
 % traces in figure 1 so missing that.
@@ -239,17 +240,14 @@ xlabel('time (s)')
 f3 = gcf;   
 f3.Position = [400 400 2000 700];
 
-% tidy data !!CUSTOMISE FOR PULSATILE APPLICATION!!
-% q.paramOne = paramOne;
-% q.paramOneVal = paramOneVal;
-% q.paramTwo = paramTwo;
-% q.paramTwoVal = paramTwoVal;
+% Package data for optional save, and create title for optional data and
+% figure saves...
 q.noiseval = noiseval;
 q.w = p.w;
 q.h = p.h;
 q.a = p.a;
 q.b = p.b;
-q.epsilon = q.epsilon;
+q.epsilon = p.epsilon;
 q.tau = p.tau;
 q.dt = p.dt;
 q.windowSecs = p.windowSecs;
@@ -258,8 +256,9 @@ q.eucWeights = p.eucWeights;
 q.noiseCHOICE = p.noiseCHOICE;
 q.endtime = p.endtime;
 q.n_runs = p.n_runs;
-q.title = strcat(p.title, '_from_', string(startStep), '_for_',...
-    string(durStep), '_on_', string(Oix), '_', string(Tix), '_', string(Nix), '_ts');
+q.title = strcat(p.title, '_from_', string(startStep), '_for_', ...
+    string(durStep), '_on_', string(Oix), '_', string(Tix), '_', ...
+    string(Nix), '_ts');
 
 % If required,save data...
 if saveData

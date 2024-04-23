@@ -4,14 +4,12 @@
 clear
 close all
 
-% load output file from which 
+% load output file from which to draw plots... 
 load('VNS_stim_output_1147915.mat') %(as used in final paper)
-
-
 
 dotColour = [0.6350 0.0780 0.1840];
 
-% Specify which noise scaler value to use (if more than one)
+% Specify index of the noise scaler value to use (only one in this example)
 noiseIx = 1;
     
 tot_timesteps = p.n_runs * p.nSteps; 
@@ -25,12 +23,12 @@ pc_dur_seizures = zeros(n_exes,n_inhs);
 totSecs = p.n_runs * p.endtime;
 totHours = totSecs/3600;
 
-
 for ex = 1:n_exes
     for in = 1:n_inhs
         cell_mat = p.foldedResults{ex,in,noiseIx};
         n_seizures(ex,in) = length(cell_mat);
-        pc_dur_seizures(ex,in) = (sum(cell_mat(2,:)) * 100) ./ cast(tot_timesteps,'double');
+        pc_dur_seizures(ex,in) = (sum(cell_mat(2,:)) * 100) ./ ...
+            cast(tot_timesteps,'double');
     end
 end
 
