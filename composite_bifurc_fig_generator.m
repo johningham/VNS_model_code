@@ -52,9 +52,10 @@ inhs = inh_min:inh_step:inh_max;
 ex_range = ex_max:-0.01:ex_min; 
 inh_range = inh_max:-0.01:inh_min;
 
-% % Ensure the existence of the folders we will need.
-% fldr = [save_path, blurb];
-% mkdir(fldr) % top level. composite plots here as well as subdirectories
+% Ensure the existence of the folders we will need.
+% oldFolder = cd(fldr);
+fldr = [save_path filesep blurb];
+mkdir(fldr) % top level. composite plots here as well as subdirectories
 % cd(fldr)
 % mkdir mat % contained in <fldr>. composite plots saved here as matlab figs
 % mkdir parts % also in <fldr>. individual plots that make the composite plots
