@@ -41,7 +41,7 @@ inh_step = 0.5;
 % Get standard parameters and tweak as needed...
 p = read_default_params();
 
-p.h(3) = -2; % change from default for bistable ODE45
+% p.h(3) = -2; % change from default for bistable ODE45
 base_params = p; % save copy to reset from as needed.
 
 % (Autocalculate steps for outer parameters)
@@ -52,15 +52,19 @@ inhs = inh_min:inh_step:inh_max;
 ex_range = ex_max:-0.01:ex_min; 
 inh_range = inh_max:-0.01:inh_min;
 
+% **DEBUGGING!!!
+ex_range = -0.9;
+inh_range = -0.7;
+
 % Ensure the existence of the folders we will need.
-% oldFolder = cd(fldr);
 fldr = [save_path filesep blurb];
+oldFolder = cd(fldr); % go to fldr and save current path.
 mkdir(fldr) % top level. composite plots here as well as subdirectories
-% cd(fldr)
-% mkdir mat % contained in <fldr>. composite plots saved here as matlab figs
-% mkdir parts % also in <fldr>. individual plots that make the composite plots
-% cd parts 
-% mkdir mat % contained in <fldr>\parts\. matlab fig versions of individual plots
+mkdir mat % contained in <fldr>. composite plots saved here as matlab figs
+mkdir parts % also in <fldr>. individual plots that make the composite plots
+cd parts 
+mkdir mat % contained in <fldr>\parts\. matlab fig versions of individual plots
+cd(oldFolder) % go back to original path
 
 for wix = 1:length(weights) % (everything goes inside this loop!)
 
@@ -77,7 +81,8 @@ for wix = 1:length(weights) % (everything goes inside this loop!)
         fig = Bifurcation_VNS_takes_params(p, param_to_change, paramrange, 2);
         ylabel('Min, Max S1') 
         xlabel('NTS Ex input')
-        fig.XLim = [ex_min, (ex_max + (ex_max - ex_min)*0.1)]; % (add a bit of space on the right)
+        fig.XLim = [ex_min, (ex_max + (ex_max - ex_min)*0.1)]; 
+        % (adds a bit of space on the right, and avoids error if min = max)
         filename = ['ExSweep', blurb, '=', num2str(connection_wt), ' NTS(inh)=', num2str(NTS_inh)];
         title(filename) % (just for its individual existence)
     
@@ -102,18 +107,17 @@ for wix = 1:length(weights) % (everything goes inside this loop!)
         ylabel('Min, Max S1') 
         xlabel('NTS Inh input')
         fig.XLim = [inh_min, (inh_max + (inh_max - inh_min)*0.1) + 0.0001]; 
-        % (add a bit of space on the right, and avoids error if min+max)
+        % (adds a bit of space on the right, and avoids error if min = max)
         filename = ['InhSweep', blurb, '=', num2str(connection_wt), ' NTS(ex)=', num2str(NTS_ex)];
         title(filename) % (just for its individual existance)
-    
-        % % (needs saving to parts and parts\mat!)
-        % oldFolder = cd(fldr);
-        % cd parts
-        % saveas(fig,[filename, '.png'])
-        % cd mat
-        % saveas(fig,[filename, '.fig'])
-        % cd(oldFolder)
-        % close all
+     
+        % (component plots need saving to parts and parts/mat)
+        cd ([fldr filesep 'parts'])
+        saveas(fig,[filename, '.png'])
+        cd mat
+        saveas(fig,[filename, '.fig'])
+        cd(oldFolder)
+        close all
     end
     p.h(21) = base_params.h(21);
     
@@ -137,24 +141,23 @@ for wix = 1:length(weights) % (everything goes inside this loop!)
             filename2 = ['InhSweep', blurb, '=', num2str(connection_wt),...
                 ' NTS(ex)=', num2str(NTS_ex) '.fig'];
 
-            % oldFolder = cd(fldr);
-            % cd parts
-            % cd mat
-            % 
-            % openfig(filename1);
-            % figure(1)
-            % ax1 = subplot(2, 2, 1, gca);
-            % title('')
-            % xline(NTS_ex, 'b--', {'current value    '})
-            % 
-            % openfig(filename2);
-            % figure(2)
-            % ax2 = subplot(2, 2, 2, gca);
-            % title('')
-            % ylabel('')
-            % xline(NTS_inh, 'b--', {'current value    '})
-            % 
-            % cd(oldFolder)
+            
+            cd([fldr filesep 'parts' filesep 'mat'])
+
+            openfig(filename1);
+            figure(1)
+            ax1 = subplot(2, 2, 1, gca);
+            title('')
+            xline(NTS_ex, 'b--', {'current value    '})
+
+            openfig(filename2);
+            figure(2)
+            ax2 = subplot(2, 2, 2, gca);
+            title('')
+            ylabel('')
+            xline(NTS_inh, 'b--', {'current value    '})
+
+            cd(oldFolder)
             
 
             % DO CORESPONDING TIME SERIES PLOTS.
@@ -228,7 +231,7 @@ for wix = 1:length(weights) % (everything goes inside this loop!)
             saveas(composite_figure,[titl, '.fig'])
             cd(oldFolder)
             
-            close all
+            % close all
         
         end
     end
