@@ -61,11 +61,13 @@ inh_step = 0.5;
 
 %% ************************************************************************
 
-% Read in standard parameters. After that adjust if needed...
+% Read in standard parameters. 
 p = read_default_params();
 
-p.h(3) = -2; % change from default for bistable ODE45 <<<<<<<<<<<<<  **!!
-base_params = p; % save copy to reset from as needed.
+% After that, adjust here if needed...
+
+% Save a copy of parameter set to reset from 
+base_params = p; 
 
 % Autocalculate values for inidvidual bifurcation sweeps
 ex_range = ex_max:-0.01:ex_min; 

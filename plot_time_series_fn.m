@@ -19,4 +19,4 @@ function fig = plot_time_series_fn(p, init_cond)
     title('VNS vectorised')
 
     fig = gca;
-    end
+end
