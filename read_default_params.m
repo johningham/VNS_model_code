@@ -15,7 +15,7 @@ function [p] = read_default_params()
 
 
     % Default static input levels
-    h(1) = -.35;      % S1 PY
+    h(1) = -0.35;      % S1 PY
     h(2) = -3.4;      % S1 IN
     h(3) = -2;        % TC
     h(4) = -12;       % RE 
@@ -27,10 +27,6 @@ function [p] = read_default_params()
     a=2.8;       % thalamic linear activation function gradient
     b=0.5;       % thalamic linear activation function y-intercept
     epsilon = 250000; 
-    % AffIn = zeros(1,22);
-    % AffIn(21) = 1;
-    % for the deterministic to replicate VNS Amari this will be all zeros
-    % except for NTS excitatory which is set to 1.
         
    % Time scale parameters
    tau(1) = 26;       
