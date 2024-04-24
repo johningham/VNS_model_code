@@ -244,10 +244,10 @@ for wix = 1:length(weights) % (everything goes inside this loop!)
             cd mat
             saveas(composite_figure,[titl, '.fig'])
 
-            close all
-
             if demo_mode
-                load([titl, '.fig'])
+                 close ([1 2 3 4])
+            else
+                close all
             end
 
             cd(oldFolder)
