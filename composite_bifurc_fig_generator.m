@@ -1,8 +1,17 @@
 % This code analyses the deterministic version of the model. It allows
-% automated generation of sets of composite plots for two-dimensional 
-% sweeps of the excitatory and inhibitory NTS background values, and to
-% perform these for a series of altered values for any specified conection 
-% weight.
+% automated generation of sets of composite plots of bifurcation plots and 
+% time series plots for two-dimensional sweeps of the excitatory and 
+% inhibitory NTS background values, and to perform these for a series of 
+% altered values for any specified conection weight. 
+% 
+% Each subplot has a nominal pair of values for the fixed background input
+% of the excitatory and inhibitory populations of the NTS. With each one of
+% these fixed in turn, the other is scanned through the ranges specified 
+% below, producing a pair of bifurcation diagrams. Forward scans use red
+% markers and backward scans use blue
+
+% When assembling these composite figures, many of the subplots will be
+% reused, so the first part of the code
 
 close all
 clear
@@ -68,7 +77,6 @@ if demo_mode
     inhs = -2;
 end
 
-
 % Ensure the existence of the folders we will need.
 fldr = [save_path filesep blurb];
 mkdir(fldr) % top level. composite plots here as well as subdirectories
@@ -126,7 +134,8 @@ for wix = 1:length(weights) % (everything goes inside this loop!)
         % (component plots need saving to parts and parts/mat)
         cd ([fldr filesep 'parts'])
         saveas(fig,[filename, '.png'])
-        cd ([fldr filesep 'parts' filesep 'mat'])
+        % cd ([fldr filesep 'parts' filesep 'mat'])
+        cd mat
         saveas(fig,[filename, '.fig'])
         cd(oldFolder)
         close all
@@ -135,7 +144,7 @@ for wix = 1:length(weights) % (everything goes inside this loop!)
     
      
     %% The nested for loops within which time series are generated, and
-    % everything is assembled, named and saved
+    % everything is assembled, named and saved.
     
     for eix = 1:length(exes)
         for iix = 1:length(inhs)
@@ -153,7 +162,6 @@ for wix = 1:length(weights) % (everything goes inside this loop!)
             filename2 = ['InhSweep', blurb, '=', num2str(connection_wt),...
                 ' NTS(ex)=', num2str(NTS_ex) '.fig'];
 
-            
             cd([fldr filesep 'parts' filesep 'mat'])
 
             openfig(filename1);
@@ -232,22 +240,21 @@ for wix = 1:length(weights) % (everything goes inside this loop!)
             copyobj(ax3, composite_figure)
             copyobj(ax4, composite_figure)
     
-            %Size figure consistently (?needed)
+            % Size figure consistently
             composite_figure.Position = [1000 200 1200 1100];
     
             % Add code to save current figure in relevant place with relevant title.
-            % (MATLAB .fig format and any other graphics format(s) of
-            % choice)
-            oldFolder = cd(fldr);
+            % Saves as MATLAB .fig format and any other graphics format(s) 
+            % of choice
+            cd(fldr);
             saveas(composite_figure,[titl, '.png'])
             saveas(composite_figure,[titl, '.svg'])
             cd mat
             saveas(composite_figure,[titl, '.fig'])
 
+            close all
             if demo_mode
-                 close ([1 2 3 4])
-            else
-                close all
+                openfig([titl, '.fig'])
             end
 
             cd(oldFolder)
