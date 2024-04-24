@@ -178,11 +178,13 @@ for rr = 1:repeats % 1 by default, but can loop for multiple start points by inc
     %% Plotting bifurcation diagram: S1
     
     
-    scatter(plot_params_fmin,s1_min_f,'ok','filled');
+    scatter(plot_params_fmin,s1_min_f,'o','filled', ...
+        'MarkerEdgeColor',[0 .5 .5 .3], ...
+        'MarkerFaceColor',[0 .7 .7 .3]);
     hold on
-    scatter(plot_params_fmax,s1_max_f,'ok','filled');
-    scatter(plot_params_bmin,s1_min_b,'or','filled');
-    scatter(plot_params_bmax,s1_max_b,'or','filled');
+    scatter(plot_params_fmax,s1_max_f,'or','filled');
+    scatter(plot_params_bmin,s1_min_b,'ob','filled');
+    scatter(plot_params_bmax,s1_max_b,'ob','filled');
     if length(param_to_change)>1
         xlabel(['Connection weight ',num2str(param_to_change)])
     else
@@ -191,6 +193,9 @@ for rr = 1:repeats % 1 by default, but can loop for multiple start points by inc
     ylabel('Termination Points')
     title('Bifurcation diagram, S1')
     
+    % scatter(x,y,sz,'MarkerEdgeColor',[0 .5 .5],...
+              % 'MarkerFaceColor',[0 .7 .7],...
+              % 'LineWidth',1.5)
     
     % One run from FP, second from zeros, subsequent from random (each for
     % both ends)
