@@ -11,7 +11,8 @@
 % markers and backward scans use blue
 
 % When assembling these composite figures, many of the subplots will be
-% reused, so the first part of the code
+% reused, so the first part of the code produces these and stores them in a
+% heirarchy of directories at a user specified location. 
 
 close all
 clear
@@ -37,7 +38,7 @@ blurb = 'NTS2RE';
 
 %% ************************TWEAK VARIABLES HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-% The example settings will 
+% The example settings do not actually alter the default values
 wt2vary = [4, 21]; % e.g.[4,21] for NTS>TC
 
 weights = 0.01; 
@@ -46,6 +47,10 @@ weights = 0.01;
 
 % Below is an example of an extensive range of parameter values for
 % background inputs to both excitatory and inhibitory populations of NTS.
+% The ranges are where most intersting behaviour occurs (with default
+% settings), it is possible to alter them to zoom in or out. Changing the
+% step can affect resolution and computing time, but too large a step may
+% affect the apparent bifurcation structure of the model.
 ex_min = -5; 
 ex_max = 5; 
 ex_step = 0.5; 
@@ -54,10 +59,9 @@ inh_min = -8;
 inh_max = 2; 
 inh_step = 0.5; 
 
-
 %% ************************************************************************
 
-% Get standard parameters and tweak as needed...
+% Read in standard parameters. After that adjust if needed...
 p = read_default_params();
 
 p.h(3) = -2; % change from default for bistable ODE45 <<<<<<<<<<<<<  **!!
@@ -86,6 +90,8 @@ mkdir parts % also in <fldr>. individual plots that make the composite plots
 cd parts 
 mkdir mat % contained in <fldr>\parts\. matlab fig versions of individual plots
 cd(oldFolder) % go back to original path
+
+
 
 for wix = 1:length(weights) % (everything goes inside this loop!)
 
