@@ -1,21 +1,10 @@
 function fig = Bifurcation_VNS_takes_params(p,param_to_change,paramrange,repeats)
-% Bifurcation diagram creator - VNS
-%
-% This code should run the VNS code deterministically forward and back
-% tracking the min and max values that the time series settles to in order
-% to determine whether the parameter space is resulting in a stable limit
-% cycle or fixed point.
-% This depends on ramping a given parameter to see the impact of this
-% parameter on the state space.
-% This code should produce two plots - one for region S1 as this represents
-% the cortical recording point where a seizure would most likely be
-% detected by EEG monitoring, and a second plot showing the state spaces
-% for all regions. (Might want this to be optional for speed).
-%
-% This is an updated version to work with the vectorised code.
+% Bifurcation diagram creator for the deterministic version of our VNS
+% model.
+
 % Assuming that the params to change will be h or w and will be a scalar
 % for h or a vector [x,y] for w.
-% FT 2023
+
 
 ignore4time = 6; % sets time after which things get measured
 
@@ -177,14 +166,11 @@ for rr = 1:repeats % 1 by default, but can loop for multiple start points by inc
     
     %% Plotting bifurcation diagram: S1
     
-    
-    scatter(plot_params_fmin,s1_min_f,'o','filled', ...
-        'MarkerEdgeColor',[0 .5 .5 .3], ...
-        'MarkerFaceColor',[0 .7 .7 .3]);
     hold on
-    scatter(plot_params_fmax,s1_max_f,'or','filled');
-    scatter(plot_params_bmin,s1_min_b,'ob','filled');
-    scatter(plot_params_bmax,s1_max_b,'ob','filled');
+    scatter(plot_params_fmin,s1_min_f,'or','filled','MarkerFaceAlpha',0.1);
+    scatter(plot_params_fmax,s1_max_f,'or','filled','MarkerFaceAlpha',0.1);
+    scatter(plot_params_bmin,s1_min_b,'ob','filled','MarkerFaceAlpha',0.05);
+    scatter(plot_params_bmax,s1_max_b,'ob','filled','MarkerFaceAlpha',0.05);
     if length(param_to_change)>1
         xlabel(['Connection weight ',num2str(param_to_change)])
     else
