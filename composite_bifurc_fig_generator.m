@@ -1,10 +1,20 @@
 % This code analyses the deterministic version of the model. It allows
 % automated generation of sets of composite plots for two-dimensional 
 % sweeps of the excitatory and inhibitory NTS background values, and to
-% perform these for a series of values for different conection weights
+% perform these for a series of altered values for any specified conection 
+% weight.
 
 close all
 clear
+
+demo_mode = true;
+% Set to TRUE to produce a single composite plot, corresponding to
+% parameters used in Figure 2 of two of the paper. 
+% Set to FALSE to produce an extensive range of combinatinons exploring
+% the parameter space. In this mode, plots are saved and then closed after 
+% generation. (WARNING! As set up here, this will generate 441 composite 
+% plots, taking considerable time to do so.)
+
 
 % Specify the path into which the final composite figures and their
 % constituent parts should be saved. (Additional structure is automatically
@@ -41,21 +51,23 @@ inh_step = 0.5;
 % Get standard parameters and tweak as needed...
 p = read_default_params();
 
-% p.h(3) = -2; % change from default for bistable ODE45
+p.h(3) = -2; % change from default for bistable ODE45 <<<<<<<<<<<<<  **!!
 base_params = p; % save copy to reset from as needed.
 
-% (Autocalculate steps for outer parameters)
-exes = ex_min:ex_step:ex_max;
-inhs = inh_min:inh_step:inh_max;
-
-% (Auto calculate for inidvidual bifurcation sweeps)
+% Autocalculate values for inidvidual bifurcation sweeps
 ex_range = ex_max:-0.01:ex_min; 
 inh_range = inh_max:-0.01:inh_min;
 
-% REDEFINED FOR DEBUGGING PURPOSES ONLY!!!
-exes = -0.9;
-inhs = -0.7;
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Autocalculate sets of parameter for which to make figures
+exes = ex_min:ex_step:ex_max;
+inhs = inh_min:inh_step:inh_max;
+
+% reset above values if demo_mode set to true
+if demo_mode 
+    exes = -2;
+    inhs = -2;
+end
+
 
 % Ensure the existence of the folders we will need.
 fldr = [save_path filesep blurb];
@@ -221,18 +233,24 @@ for wix = 1:length(weights) % (everything goes inside this loop!)
             copyobj(ax4, composite_figure)
     
             %Size figure consistently (?needed)
-%             fig.Position = [1000 200 1200 1100];
+            composite_figure.Position = [1000 200 1200 1100];
     
             % Add code to save current figure in relevant place with relevant title.
-            % For now... 
+            % (MATLAB .fig format and any other graphics format(s) of
+            % choice)
             oldFolder = cd(fldr);
             saveas(composite_figure,[titl, '.png'])
+            saveas(composite_figure,[titl, '.svg'])
             cd mat
             saveas(composite_figure,[titl, '.fig'])
+
+            close all
+
+            if demo_mode
+                load([titl, '.fig'])
+            end
+
             cd(oldFolder)
-            
-            % close all
-        
         end
     end
 end
