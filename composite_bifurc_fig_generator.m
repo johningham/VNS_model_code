@@ -39,9 +39,9 @@ blurb = 'NTS2RE';
 %% ************************TWEAK VARIABLES HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 % The example settings do not actually alter the default values
-wt2vary = [4, 21]; % e.g.[4,21] for NTS>TC
+wt2vary = [4, 21]; % e.g.[4,21] for NTS>RE
 
-weights = 0.01; 
+weights = 0.08; 
 % (lists or ranges may be used to scan over a number of different values of
 % the desired connection weight)
 
@@ -65,6 +65,7 @@ inh_step = 0.5;
 p = read_default_params();
 
 % After that, adjust here if needed...
+p.w(4,15) = 0.01;
 
 % Save a copy of parameter set to reset from 
 base_params = p; 

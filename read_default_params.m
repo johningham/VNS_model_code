@@ -8,7 +8,7 @@ function [p] = read_default_params()
     struct = load('VNSconnectivity.mat');
     w = struct.mat;
 
-    % note that weights between TC and RE regions are not included above,
+    % Note that weights between TC and RE regions are not included above,
     % due to a different set of equations being used. 
     % These are handled separately below...
     p.TC2RE = 0.6;
@@ -16,12 +16,14 @@ function [p] = read_default_params()
     p.RE2RE = 10.5;
 
     % Default static input levels
-    h(1) = -0.35;      % S1 PY
-    h(2) = -3.4;      % S1 IN
-    h(3) = -2;        % TC
-    h(4) = -12;       % RE 
-    h(5:2:21) = h(1); % set all other PYs to the same base input by default.
-    h(6:2:22) = h(2); % set all other INs to the same base input by default.
+    h(1)  = -0.35;    % S1_PY
+    h(2)  = -3.4;     % S1_IN
+    h(3)  = -1.5;     % TC
+    h(4)  = -12;      % RE 
+    h(21) = -1.5;     % NTS_PY (value used throught for calculating FP)
+    h(22) = -3.4;     % NTS_IN (value used throught for calculating FP)
+    h(5:2:19) = h(1); % set all other PYs to the same base input by default.
+    h(6:2:20) = h(2); % set all other INs to the same base input by default.
     
     h=h'; % Flip to column vector
         

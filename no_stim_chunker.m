@@ -68,16 +68,11 @@ p.threshold = threshold;
 p.eucWeights = eucWeights;
 
 % (then ammend any weights, offsets, noise scaling etc)
-p.w(4,21) = 0.08; % default = 0.08
-p.w(15,21) = 3; % default = 3
-p.w(4,15) = 0.01; % default = 0!
-% p.h(3) = -2.0; % default = -2.05 (with 2 and 2.2 also being used)
-% p.h(1) = -0.3; % default = -0.35
+
+
 p.h(21) = -1.5; % default = -0.35
 
-% (then ammend any weights, offsets, noise scaling etc)
-p.w(4,21) = 0.08; % default = 0.08, but connectivity.mat value is 0.01
-p.w(4,15) = 0.01; % default = 0.01, but connectivity.mat value is ZERO
+
  
 
 
