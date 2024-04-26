@@ -5,7 +5,6 @@ function fig = Bifurcation_VNS_takes_params(p,param_to_change,paramrange,repeats
 % Assuming that the params to change will be h or w and will be a scalar
 % for h or a vector [x,y] for w.
 
-
 ignore4time = 6; % sets time after which things get measured
 
 if nargin < 4
@@ -15,15 +14,14 @@ end
 set(0,'defaultfigurecolor',[1 1 1]) % set figure background to white.
 
 %initial condition near the fixed point
-% S1_PY, SI_IN,   TC  ,  RE  ,INS_EX,INS_IN,ACC_EX,ACC_IN,
+%                      S1_PY, SI_IN,     TC,    RE,INS_PY,INS_IN,ACC_PY,ACC_IN,
 near_FP_conditions = [0.1724,0.1787,-0.0818,0.2775,0.0724,0.0787,0.0724,0.0787,...
     0.0724,0.0787,0.0724,0.0787,0.0724,0.0787,0.0724,0.0787,0.0724,0.0787,0.0724,0.0787,0.1724,0.1787];
-%   PFC_EX,PFC_IN,Amy_Ex,Amy_In,Hyp_Ex,Hyp_In, LC_Ex, LC_In,DRN_Ex,DRN_In, PB_Ex, PB_In,STN_Ex,STN_In
+%   PFC_PY,PFC_IN,Amy_PY,Amy_In,Hyp_Ex,Hyp_In, LC_PY, LC_In,DRN_PY,DRN_In, PB_PY, PB_In,STN_PY,STN_In
 
 init_cond = near_FP_conditions; 
 
 figure; hold on; % set up blank canvas and keep plotting on it.
-
 
 for rr = 1:repeats % 1 by default, but can loop for multiple start points by including repeats > 1
 
@@ -40,7 +38,6 @@ for rr = 1:repeats % 1 by default, but can loop for multiple start points by inc
     s1_min_b = [];
     s1_max_b = [];
         
-    
     %% forward scan:
 
     % run model once after randomising to stabilise system
@@ -109,7 +106,6 @@ for rr = 1:repeats % 1 by default, but can loop for multiple start points by inc
     [~,u]=ode45(@(t,u)VNS_vectorise(t,u,p),[0 200],init_cond);%background state
     init_cond = u(end,:);
 
-    
     for i=1:length(params_b)
         
         if isscalar(param_to_change) %  if it is a scalar then it is a static input
@@ -163,9 +159,7 @@ for rr = 1:repeats % 1 by default, but can loop for multiple start points by inc
         init_cond = u(end,:);
     end
     
-    
     %% Plotting bifurcation diagram: S1
-    
     hold on
     scatter(plot_params_fmin,s1_min_f,'or','filled','MarkerFaceAlpha',0.1);
     scatter(plot_params_fmax,s1_max_f,'or','filled','MarkerFaceAlpha',0.1);
@@ -179,12 +173,9 @@ for rr = 1:repeats % 1 by default, but can loop for multiple start points by inc
     ylabel('Termination Points')
     title('Bifurcation diagram, S1')
     
-    % scatter(x,y,sz,'MarkerEdgeColor',[0 .5 .5],...
-              % 'MarkerFaceColor',[0 .7 .7],...
-              % 'LineWidth',1.5)
-    
-    % One run from FP, second from zeros, subsequent from random (each for
-    % both ends)
+    % First sweeps run from FP, second sweeps from LC.
+    % Subsequent sweeps from random points at either end.
+    % (Default value 2, used for paper figure)
     if rr == 1
         init_cond = zeros(1,22);
     else
@@ -192,9 +183,6 @@ for rr = 1:repeats % 1 by default, but can loop for multiple start points by inc
     end
 end
 
-
 fig = gca;
 
 end
-
-
