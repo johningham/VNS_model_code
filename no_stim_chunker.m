@@ -70,8 +70,10 @@ p.eucWeights = eucWeights;
 % (then ammend any weights, offsets, noise scaling etc)
 
 
-p.h(21) = -1.5; % default = -0.35
+% p.h(21) = -1.5; % default = -0.35
 
+% p.h(21) = -1.5;    % (FP/LC generation)
+% p.h(22) = -3.4; 
 
  
 

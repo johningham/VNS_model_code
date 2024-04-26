@@ -2,15 +2,15 @@ function [p] = read_default_params()
 % Allows setup of standard setup of parameters used as a starting point by
 % all versions of the model.
 
-    % Sets the default connectivity parameters between regions. 
-    % (Weights needs to be a matrix of region x region with entries only 
-    %  where there are connections present.)
+    % Sets the default connection weights between populations. 
+    % Weights are stored as a 22x22 matrix, w, where w(i,j) represents the
+    % weight of a connection from poluation j to population i.
     struct = load('VNSconnectivity.mat');
     w = struct.mat;
 
     % Note that weights between TC and RE regions are not included above,
     % due to a different set of equations being used. 
-    % These are handled separately below...
+    % These are handled separately, with the following values
     p.TC2RE = 0.6;
     p.RE2TC = 0.2;
     p.RE2RE = 10.5;
@@ -18,16 +18,16 @@ function [p] = read_default_params()
     % Default static input levels
     h(1)  = -0.35;    % S1_PY
     h(2)  = -3.4;     % S1_IN
-    h(3)  = -1.5;     % TC
+    h(3)  = -2;     % TC
     h(4)  = -12;      % RE 
-    h(21) = -1.5;     % NTS_PY (value used throught for calculating FP)
-    h(22) = -3.4;     % NTS_IN (value used throught for calculating FP)
-    h(5:2:19) = h(1); % set all other PYs to the same base input by default.
-    h(6:2:20) = h(2); % set all other INs to the same base input by default.
+    h(5:2:21) = h(1); % Set all other PYs to the same base input by default.
+    h(6:2:22) = h(2); % Set all other INs to the same base input by default.
+    % h(21) = -1.5;     % NTS_PY (value used throught for calculating FP)
+    % h(22) = -3.4;     % NTS_IN (value used throught for calculating FP)
     
-    h=h'; % Flip to column vector
+    h=h'; % (Flip to column vector)
         
-    % Time scale parameters
+    % Time scale parameters for each population
     tau(1) = 26;       
     tau(2) = 32.5;    
     tau(3) = 2.6;    
@@ -51,10 +51,9 @@ function [p] = read_default_params()
     tau(21) = 26;       
     tau(22) = 32.5;    
     
-    % Misc
-    a=2.8;                % thalamic linear activation function gradient
-    b=0.5;                % thalamic linear activation function y-intercept
-    epsilon = 250000;     % determines sigmoid activation function gradient  
+    a=2.8;               % Thalamic linear activation function gradient.
+    b=0.5;               % Thalamic linear activation function y-intercept.
+    epsilon = 250000;    % Determines sigmoid activation function gradient.  
 
     p.w = w;
     p.h = h;

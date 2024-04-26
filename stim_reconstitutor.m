@@ -58,8 +58,8 @@ initsOTNER = p.init_states; % (paramOne, paramTwo, Noise, Epoch, Region)
 initsER = permute((initsOTNER(Oix,Tix,Nix,:,:)),[4 5 1 2 3]);
 
 
-% BORROWED CODE (cut, pasted and hacked about)
-%% Find precise FP conditions (for current params, no noise, no stim) for measurements later
+
+%% Find precise FP
 
 % (We have debated doing array of FP/LC conditions all parameter
 % combinations in the sweep. This would have possibly made seizure
@@ -73,12 +73,12 @@ initsER = permute((initsOTNER(Oix,Tix,Nix,:,:)),[4 5 1 2 3]);
 % Amy_Ex, Amy_In, Hyp_Ex, Hyp_In, LC_Ex, LC_In, DRN_Ex, DRN_In, PB_Ex,
 % PB_In, STN_Ex, STN_In)
 
-% Find exact FP (runs for 10 secs, done once in single dimension, so low overhead)
+% Find exact FP (runs for 10 secs, done once in single dimension)
 nearFP = [0.1724,0.1787,-0.0818,0.2775,0.0724,0.0787,0.0724,0.0787,...
     0.0724,0.0787,0.0724,0.0787,0.0724,0.0787,0.0724,0.0787,0.0724,...
     0.0787,0.0724,0.0787,0.1724,0.1787];
 nStps = int32(10/p.dt + 1);  
-p.stimVal = [0,0]; % Leave it!
+p.stimVal = [0,0]; % (Not used but needs to be set)
 p.noisevecs = zeros(nStps, 22);
 [~,uFP] = vectorised_eulersolver(@(t,uFP)VNSfn_stoch_vec_Euler_stim(t,uFP,p), nearFP, dt, 10);
 exactFP = uFP(end,:);
@@ -175,7 +175,6 @@ smooth_eucs = smooth_eucs(preChop:end-postChop);
 compositeSeries = compositeSeries(preChop:end-postChop,:);
 startSecs = startStep * dt;
 endSecs = endStep * dt;
-
 
 % plot S1 (included threshold, start of noise if relevant etc)
 figure(1)

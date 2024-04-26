@@ -5,7 +5,7 @@ clear
 close all
 
 % load output file from which to draw plots... 
-load('VNS_stim_output_1147915.mat') %(as used in final paper)
+load('VNS_stim_output_1147915.mat') % (as used in final paper)
 
 dotColour = [0.6350 0.0780 0.1840];
 

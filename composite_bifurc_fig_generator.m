@@ -25,7 +25,6 @@ demo_mode = true;
 % generation. (WARNING! As set up here, this will generate 441 composite 
 % plots, taking considerable time to do so.)
 
-
 % Specify the path into which the final composite figures and their
 % constituent parts should be saved. (Additional structure is automatically
 % created below this level in order to keep the output organised.) 
@@ -36,14 +35,12 @@ blurb = 'NTS2RE';
 % weight being varied. It also ensures that it has its own directory into
 % which it will store the output figures)
 
-%% ************************TWEAK VARIABLES HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-% The example settings do not actually alter the default values
-wt2vary = [4, 21]; % e.g.[4,21] for NTS>RE
+% (The example settings here do not actually alter the default values.)
+wt2vary = [4,21]; % [TO,FROM] e.g.[4,21] for NTS>RE
 
 weights = 0.08; 
-% (lists or ranges may be used to scan over a number of different values of
-% the desired connection weight)
+% (lists or ranges may be used here to scan over a number of different 
+% values of the desired connection weight)
 
 % Below is an example of an extensive range of parameter values for
 % background inputs to both excitatory and inhibitory populations of NTS.
@@ -59,13 +56,28 @@ inh_min = -8;
 inh_max = 2; 
 inh_step = 0.5; 
 
-%% ************************************************************************
+% Set number of sweeps (forward AND backward). 
+% First sweeps run from FP, second sweeps from LC.
+% Subsequent sweeps from random points at either end.
+% (Default value 2, used for paper figure)
+repeats = 2;
 
 % Read in standard parameters. 
 p = read_default_params();
 
 % After that, adjust here if needed...
-p.w(4,15) = 0.01;
+
+% p.w(4,15) = 0.01;    % pretty sure these are the weights we settled on...
+% p.w(4,21) = 0.08;
+% 
+% p.h(21)  = -0.35;    % (original matrix and what is says in paper)
+% p.h(22)  = -3.4;
+% 
+% p.h(21) = -0.9;    % (Fixed values used in stochastic system)
+% p.h(22) = -0.7;     
+% 
+% p.h(21) = -1.5;    % (FP/LC generation)
+% p.h(22) = -3.4; 
 
 % Save a copy of parameter set to reset from 
 base_params = p; 
@@ -108,7 +120,7 @@ for wix = 1:length(weights) % (everything goes inside this loop!)
     for iix = 1:length(inhs)
         NTS_inh = inhs(iix);
         p.h(22) = NTS_inh;
-        fig = Bifurcation_VNS_takes_params(p, param_to_change, paramrange, 2);
+        fig = Bifurcation_VNS_takes_params(p, param_to_change, paramrange, repeats);
         ylabel('Min, Max S1') 
         xlabel('NTS Ex input')
         fig.XLim = [ex_min, (ex_max + (ex_max - ex_min)*0.1)]; 
