@@ -10,7 +10,7 @@ function [p] = read_default_params()
 
     % Note that weights between TC and RE regions are not included above,
     % due to a different set of equations being used. 
-    % These are handled separately, with the following values
+    % These are handled separately, with the following values...
     p.TC2RE = 0.6;
     p.RE2TC = 0.2;
     p.RE2RE = 10.5;
@@ -22,10 +22,6 @@ function [p] = read_default_params()
     h(4)  = -12;      % RE 
     h(5:2:21) = h(1); % Set all other PYs to the same base input by default.
     h(6:2:22) = h(2); % Set all other INs to the same base input by default.
-    % h(21) = -1.5;     % NTS_PY (value used throught for calculating FP)
-    % h(22) = -3.4;     % NTS_IN (value used throught for calculating FP)
-    
-    h=h'; % (Flip to column vector)
         
     % Time scale parameters for each population
     tau(1) = 26;       
@@ -56,9 +52,10 @@ function [p] = read_default_params()
     epsilon = 250000;    % Determines sigmoid activation function gradient.  
 
     p.w = w;
-    p.h = h;
+    p.h = h'; % (flips to column vector)
     p.a = a;
     p.b = b;
     p.epsilon = epsilon;
     p.tau = tau;
+    
 end
