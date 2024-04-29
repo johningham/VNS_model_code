@@ -2,8 +2,9 @@ function fig = Bifurcation_VNS_takes_params(p,param_to_change,paramrange,repeats
 % Bifurcation diagram creator for the deterministic version of our VNS
 % model.
 
-% Assuming that the params to change will be h or w and will be a scalar
-% for h or a vector [x,y] for w.
+% If param_to_change is a scaler integer from 1 to 22, the corresponding 
+% population background activity level (h) will automatically be swept. 
+% If passed a vector of two such values, will sweepconnection weight (w). 
 
 ignore4time = 6; % sets time after which things get measured
 
