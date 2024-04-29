@@ -3,7 +3,7 @@ function fig = plot_time_series_fn(p, init_cond)
 % figure showing a section of time series after equilibrium reached.
     
     % run model once after randomising to stabilise system
-    [~,u]=ode45(@(t,u)VNS_vectorise(t,u,p),[0 200],init_cond); %background state
+    [~,u]=ode45(@(t,u)VNS_vectorise(t,u,p),[0 6],init_cond); 
     init_cond = u(end,:);
     
     % Run the model:
