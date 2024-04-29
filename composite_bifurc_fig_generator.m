@@ -20,7 +20,7 @@ clear
 demo_mode = true;
 % Set to TRUE to produce a single composite plot, corresponding to
 % parameters used in Figure 2 of two of the paper. 
-% Set to FALSE to produce an extensive range of combinatinons exploring
+% Set to FALSE to produce an extensive range of combinations exploring
 % the parameter space. In this mode, plots are saved and then closed after 
 % generation. (WARNING! As set up here, this will generate 441 composite 
 % plots, taking considerable time to do so.)
@@ -39,8 +39,9 @@ blurb = 'NTS2RE';
 wt2vary = [4,21]; % [TO,FROM] e.g.[4,21] for NTS>RE
 
 weights = 0.08; 
-% (lists or ranges may be used here to scan over a number of different 
-% values of the desired connection weight)
+% ('weights' may be set as a single value, as above, or as a list or range 
+% may be given  to scan over multiple values of the desired connection 
+% weight)
 
 % Below is an example of an extensive range of parameter values for
 % background inputs to both excitatory and inhibitory populations of NTS.
@@ -59,28 +60,13 @@ inh_step = 0.5;
 % Set number of sweeps (forward AND backward). 
 % First sweeps run from FP, second sweeps from LC.
 % Subsequent sweeps from random points at either end.
-% (Default value 2, used for paper figure)
+% (Default value 2, as used for paper figure)
 repeats = 2;
 
 % Read in standard parameters. 
 p = read_default_params();
 
-% After that, adjust here if needed...
-
-% p.w(4,15) = 0.01;    % pretty sure these are the weights we settled on...
-% p.w(4,21) = 0.08;
-% 
-% p.h(21)  = -0.35;    % (original matrix and what is says in paper)
-% p.h(22)  = -3.4;
-% 
-% p.h(21) = -0.9;    % (Fixed values used in stochastic system)
-% p.h(22) = -0.7;     
-% 
-% p.h(21) = -1.5;    % (FP/LC generation)
-% p.h(22) = -3.4; 
-
-% Save a copy of parameter set to reset from 
-base_params = p; 
+% Make any adjustments here, if needed...
 
 % Autocalculate values for inidvidual bifurcation sweeps
 ex_range = ex_max:-0.01:ex_min; 
@@ -106,8 +92,6 @@ cd parts
 mkdir mat % contained in <fldr>\parts\. matlab fig versions of individual plots
 cd(oldFolder) % go back to original path
 
-
-
 for wix = 1:length(weights) % (everything goes inside this loop!)
 
     % Set strength of relevant connection 
@@ -125,10 +109,11 @@ for wix = 1:length(weights) % (everything goes inside this loop!)
         xlabel('NTS Ex input')
         fig.XLim = [ex_min, (ex_max + (ex_max - ex_min)*0.1)]; 
         % (adds a bit of space on the right, and avoids error if min = max)
-        filename = ['ExSweep', blurb, '=', num2str(connection_wt), ' NTS(inh)=', num2str(NTS_inh)];
-        title(filename) % (just for its individual existence)
+        filename = ['ExSweep', blurb, '=', num2str(connection_wt), ...
+            ' NTS(inh)=', num2str(NTS_inh)];
+        title(filename)
     
-        % (needs saving to parts and parts\mat!)
+        % (component plots need saving to 'parts' and 'parts/mat')
         cd ([fldr filesep 'parts'])
         saveas(fig,[filename, '.png'])
         cd ([fldr filesep 'parts' filesep 'mat'])
@@ -136,36 +121,33 @@ for wix = 1:length(weights) % (everything goes inside this loop!)
         cd(oldFolder)
         close all
     end
-    p.h(22) = base_params.h(22);
 
     % Loop and create NTS_Inh sweeps for various NTS_Ex. Save to 'parts'
     param_to_change = 22; % (NTS inhibitory)
     paramrange = inh_range; 
-    for iix = 1:length(exes)
-        NTS_ex = exes(iix);
+    for eix = 1:length(exes)
+        NTS_ex = exes(eix);
         p.h(21) = NTS_ex;
-        fig = Bifurcation_VNS_takes_params(p, param_to_change, paramrange, 2);
+        fig = Bifurcation_VNS_takes_params(p, param_to_change, paramrange, repeats);
         ylabel('Min, Max S1') 
         xlabel('NTS Inh input')
         fig.XLim = [inh_min, (inh_max + (inh_max - inh_min)*0.1) + 0.0001]; 
         % (adds a bit of space on the right, and avoids error if min = max)
-        filename = ['InhSweep', blurb, '=', num2str(connection_wt), ' NTS(ex)=', num2str(NTS_ex)];
-        title(filename) % (just for its individual existance)
+        filename = ['InhSweep', blurb, '=', num2str(connection_wt), ...
+            ' NTS(ex)=', num2str(NTS_ex)];
+        title(filename)
      
-        % (component plots need saving to parts and parts/mat)
+        % (component plots need saving to 'parts' and 'parts/mat')
         cd ([fldr filesep 'parts'])
         saveas(fig,[filename, '.png'])
-        % cd ([fldr filesep 'parts' filesep 'mat'])
         cd mat
         saveas(fig,[filename, '.fig'])
         cd(oldFolder)
         close all
     end
-    p.h(21) = base_params.h(21);
-    
-     
-    %% The nested for loops within which time series are generated, and
-    % everything is assembled, named and saved.
+   
+    %% The nested for loops within which time series plots are generated, 
+    % and everything is assembled, named and saved.
     
     for eix = 1:length(exes)
         for iix = 1:length(inhs)
@@ -175,9 +157,8 @@ for wix = 1:length(weights) % (everything goes inside this loop!)
     
             close all
 
-            % fetch ax1 and ax2 from file. Alter labels and titles as needed.
-            % Subplot each. 
-            
+            % Fetch ax1 and ax2 from file. Alter labels and titles as 
+            % needed. Subplot each. 
             filename1 = ['ExSweep', blurb, '=', num2str(connection_wt),...
                 ' NTS(inh)=', num2str(NTS_inh), '.fig'];
             filename2 = ['InhSweep', blurb, '=', num2str(connection_wt),...
@@ -200,8 +181,7 @@ for wix = 1:length(weights) % (everything goes inside this loop!)
 
             cd(oldFolder)
             
-
-            % DO CORESPONDING TIME SERIES PLOTS.
+            % MAKE CORESPONDING TIME SERIES PLOTS.
             p.h(21) = NTS_ex;
             p.h(22) = NTS_inh;
             % Get figure for time series at FP (if present) by calling plot_time_series_fn.
@@ -215,17 +195,15 @@ for wix = 1:length(weights) % (everything goes inside this loop!)
                 ylabel('S1','FontSize',20)
                 title('"FP"')
                 
-            % Get figure for time series at LC (if present) by calling plot_time_series_fn.
-            % (quick and dirty way to start close to seizure)
-            init_cond = zeros(1,22); 
-            
+            % Get figure for time series at LC (if present) by calling 
+            % plot_time_series_fn.            
+            init_cond = zeros(1,22); % (quick and dirty way to start close to seizure)
             ax4 = subplot(2,2,4,plot_time_series_fn(p, init_cond));
                 xlabel('Time (sec)','FontSize',20)
                 ylabel('')
                 title('"LC"')
             
             % Get all Y-axes on same scale
-
             h1 = findobj(ax1, 'Type', 'scatter');
             yd1 = get(h1, 'YData');
             hc1 = horzcat(yd1{:});
@@ -241,8 +219,7 @@ for wix = 1:length(weights) % (everything goes inside this loop!)
             ax1_lim = [ax1_min, ax1_max];
             ax2_lim = [ax2_min, ax2_max];
            
-            ylims = vertcat(ax1_lim, ax2_lim);%, ax3.YLim, ax4.YLim); 
-            % (For now ignore YLims of time series)
+            ylims = vertcat(ax1_lim, ax2_lim);
             ylimsMin = min(ylims(:,1));
             ylimsMax = max(ylims(:,2));
             NuLim = [ylimsMin, (ylimsMax + 0.1)]; % (add some headroom for title)
@@ -264,9 +241,10 @@ for wix = 1:length(weights) % (everything goes inside this loop!)
             % Size figure consistently
             composite_figure.Position = [1000 200 1200 1100];
     
-            % Add code to save current figure in relevant place with relevant title.
+            % Add code to save current figure in relevant place with 
+            % relevant title.
             % Saves as MATLAB .fig format and any other graphics format(s) 
-            % of choice
+            % of choice.
             cd(fldr);
             saveas(composite_figure,[titl, '.png'])
             saveas(composite_figure,[titl, '.svg'])
@@ -275,7 +253,7 @@ for wix = 1:length(weights) % (everything goes inside this loop!)
 
             close all
             if demo_mode
-                openfig([titl, '.fig'])
+                openfig([titl, '.fig']);
             end
 
             cd(oldFolder)
