@@ -2,7 +2,8 @@
 % automated generation of sets of composite plots of bifurcation plots and 
 % time series plots for two-dimensional sweeps of the excitatory and 
 % inhibitory NTS background values, and to perform these for a series of 
-% altered values for any specified conection weight. 
+% altered values for any specified conection weight. Parts of these were
+% used in figure 2 of the paper.
 % 
 % Each subplot has a nominal pair of values for the fixed background input
 % of the excitatory and inhibitory populations of the NTS. With each one of

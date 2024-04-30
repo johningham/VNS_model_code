@@ -1,4 +1,6 @@
 function dudt=VNS_vectorise(~,u,p)
+% Implementation of model equations for deterministic case, for use with 
+% MATLAB ODE45 solver.
 
 % u is the initial state of the populations and needs to be a vector the 
 % same length as the number of regions (22).
