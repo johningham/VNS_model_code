@@ -1,8 +1,19 @@
-% This code uses the noisy version of the model, but without any simulated 
-% VNS. It allows two dimensional parameter sweeps for any combination of
-% connection weights or background activity parameters. It was used with 
-% the settings below to perform the one dimensional sweep of NTS_py seen 
-% in Fig 3A of the paper. 
+% This code will run a series of stochastic simulations, for different 
+% combinations of constant input to NTS excitatory and inhibitory 
+% populations and noise levels. For each combination the same noise series 
+% are used. 
+% 
+% Due to RAM constraints, continuous runs are divided into epochs, each 
+% starting with a consecutive noise seed. The output of this code is stored 
+% in a compact format as the starting timestep and duration of each seizure 
+% event, as well as the initial conditions. From this we can calculate 
+% seizure frequency and duration also reconstitute sections of the time 
+% series of interest.
+% 
+% The code can be parallelised (performing runs for more than parameter set 
+% at a time) with MATLAB Parallel Toolbox. If not using this, change the 
+% "parfor" loop on line *** to a "for" loop.
+
 
 close all
 clear
@@ -12,71 +23,69 @@ clear
 
 tic
 
-paramOne = 21; % single value for p.h(i) or pair ([i,j]) for p.w(i,j)
-% (usually the NTS(Py) offset -- p.h(21) and its values)
-% paramOneValues = -1:0.01:0; % what was used in the paper
-paramOneValues = -1:0.1:0; % courser intervals to run faster.
+% SETUP PARAMS HERE!!!*****************************************************
 
-paramTwo = 22; % single value for p.h(i) or pair ([i,j]) for p.w(i,j)
+paramOne = 21; % a single value for p.h(i) or pair ([i,j]) for p.w(i,j)
+% (usually the NTS(Py) offset -- p.h(21) and its values)
+paramOneValues = -1:0.01:0; % what was used in the paper
+
+paramTwo = 22; % a single value for p.h(i) or pair ([i,j]) for p.w(i,j)
 % (usually the NTS(Inh) offset -- p.h(22) and its values)
 paramTwoValues = 0; % specify single value when not wishing to sweep this parameter
 
 nParamOne = length(paramOneValues);
 nParamTwo = length(paramTwoValues);
 
-% Other important settings go here:
-
-dt = 0.0001; % (timestep: 0.0001 - 100microseconds - used throughout paper)
-endtime = 100; % (simulated seconds for each section of epoch)  
-% (NOTE cannot compare runs runs where sections are different lengths as rng
-% seeding will be different!! 100s used throughout paper)
-
 % set number of epochs
-% nRuns = 100; % what was used for the examples in the paper.
-nRuns = 1; % to run quickly for testing
+nRuns = 100; % what was used for the examples in the paper.
+% nRuns = 1; % to run quickly for testing
 
+endtime = 100; % (simulated seconds for each section of epoch)  
+% (NOTE cannot compare runs runs where sections are different lengths as 
+% rng seeding will be different!! 100s used throughout paper)
 
-% use to switch dimensions contributing to Euclidean distance
-% calculation...
-% eucWeights = [1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0]; 
-% (everything but NTS)
+% *************************************************************************
+
+%% Other important settings go here:
+
+dt = 0.0001; % timestep: 0.0001s (100 microseconds) used throughout paper
+
+% Select the dimensions contributing to Euclidean distance calculation
 eucWeights = [1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]; 
-% (just S1 populations, used in paper)
+% (this setting considers only the S1 populations, as in the paper)
 
 % width of window for moving average calculations
 windowSecs = 2; % needs to be less than endtime (not much sense if not anyway)
 halfwindow = floor(windowSecs/(2*dt));
-wyndoh = halfwindow*2 +1; % easier if consistently an odd integer
+wyndoh = halfwindow * 2 + 1; % easier if consistently an odd integer
 
 % value used on moving average for seizure detection threshold
-threshold = 0.15; % (0.15 suitable if just sticking with S1 to calc Euc Distance)
+threshold = 0.15; 
+% (0.15 suitable if using S1 populations to calculate euclidean distance. 
+% Determined empirically. This setting was used in the paper)
 
 % get and modify standard parameters
 p = read_default_params();
 
-% (just stick anything else I want to pass to function into 'p')
+% (further information that may be passed between functions, and ultimately
+% stored, can be put within the data structure, 'p')
 p.startedAt = datetime;
 p.dt = dt;
+p.endtime = endtime;
+p.nRuns = nRuns;
+
+p.windowSecs = windowSecs;
+p.threshold = threshold;
+p.eucWeights = eucWeights;
+
 p.paramOne = paramOne;
 p.ParamOneValues = paramOneValues;
 p.nParamOne = nParamOne;
 p.paramTwo = paramTwo;
 p.paramTwoValues = paramTwoValues;
 p.nParamTwo = nParamTwo;
-p.windowSecs = windowSecs;
-p.threshold = threshold;
-p.eucWeights = eucWeights;
 
-% (then ammend any weights, offsets, noise scaling etc)
-
-
-% p.h(21) = -1.5; % default = -0.35
-
-% p.h(21) = -1.5;    % (FP/LC generation)
-% p.h(22) = -3.4; 
-
- 
-
+% If needed, ammend defuault settings of any weights, offsets etc here:
 
 % templates for noiseINJECTED
 noiseEX = repmat([1,0],1,11); 
@@ -85,9 +94,6 @@ noiseOFF = zeros(1,22);
 noiseNTS = noiseOFF; noiseNTS(21) = 1;
 noisePY = noiseOFF; noisePY(1) = 1;
 noiseTC = [0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0];
-noiseCustom1 = [1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1];
-noiseCustom2 = [1 0 0 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0];
-noiseCustom3 = [1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0];
 
 % Noise settings...
 nNoises = 1; % (sets the number of different noise levels that will be used)
@@ -108,18 +114,18 @@ end
 p.noiseCHOICE = noiseCHOICE;
 p.noiseScalers = noiseScalers;
 
-% Initial condition sets:
-% (S1_PY, SI_IN, TC, RE, INS_EX, INS_IN, ACC_EX, ACC_IN, PFC_EX, PFC_IN, 
-% Amy_Ex, Amy_In, Hyp_Ex, Hyp_In, LC_Ex, LC_In, DRN_Ex, DRN_In, PB_Ex,
-% PB_In, STN_Ex, STN_In)
+%% Find precise FP and LC conditions (for current params, no noise, no stim) for measurements later
 
 nearFP = [0.1724,0.1787,-0.0818,0.2775,0.0724,0.0787,0.0724,0.0787,...
     0.0724,0.0787,0.0724,0.0787,0.0724,0.0787,0.0724,0.0787,0.0724,...
     0.0787,0.0724,0.0787,0.1724,0.1787];
+% (a starting state that reliably progresses to the fixed point - across a 
+% wide parameter range)
    
 nearLC = zeros(1,22);
+% (a starting state that reliably progresses to the limit cycle - when it
+% exists - across a wide parameter range)
 
-%% Find precise FP conditions (for current params, no noise, no stim) for measurements later
 
 % (We have debated doing array of FP/LC conditions all parameter
 % combinations in the sweep. This would have possibly made seizure
@@ -127,8 +133,11 @@ nearLC = zeros(1,22);
 % will not exist at many of these combinations. A such, we are keeping the
 % original, lower dimension functions for this purpose. A bit inelegant,
 % but pragmatic...)
+
+% Explictly state the 
+
 nSteps = int32(10/p.dt + 1);  % (runs for 10 secs, done once in single dimension, so low overhead)
-p.stimVal = [0,0]; % Leave it!
+p.stimVal = [0,0]; % (not used, but function needs these passing)
 p.noisevecs = zeros(nSteps, 22);
 [~,uFP] = vectorised_eulersolver(@(t,uFP)VNSfn_stoch_vec_Euler_stim(t,uFP,p), nearFP, dt, 10);
 exactFP = uFP(end,:);
@@ -177,8 +186,8 @@ sliceTwo = listParamTuples(2,:);
 sliceNoise = listParamTuples(3,:);
 
 %% PARFOR LOOP STARTS HERE!
-% parfor lix = 1:listLength
-for lix = 1:listLength % (substitute for loop if not using parallelisation)
+parfor lix = 1:listLength
+% for lix = 1:listLength % (substitute for loop if not using parallelisation)
     % state of system at end of run. Initiate at zero (no seizure)
     seizureFlag = 0;
 
