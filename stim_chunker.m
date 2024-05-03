@@ -1,20 +1,28 @@
 % For fixed background input to NTS populations, and with other parameters 
-% also fixed, this code will run  a series of stochastic simulations, using 
-% the same noise seeds, for different VNS amplitudes. Effective stimulation 
-% levels can be specified for both the excitatory and inhibitory
-% populations, and all combinations tested, although the example given here
-% has all the stimulation applied to the excitatory population of NTS.
-%
+% also fixed, this code will run a series of stochastic simulations, using 
+% the same noise series, for different VNS amplitudes. 
+% 
+% Combinations of different stimulation levels for both the excitatory and 
+% inhibitory populations, although the example given here has all the 
+% stimulation applied to the excitatory population of NTS. 
+% 
+% Due to RAM constraints, continuous runs are divided into epochs, each 
+% starting with a consecutive noise seed. The output of this code is stored 
+% in a compact format as the starting timestep and duration of each seizure 
+% event, as well as the initial conditions. From this we can calculate 
+% seizure frequency and duration also reconstitute sections of the time 
+% series of interest.
+% 
 % VNS is modelled as an idealised square wave, for which pulse width and 
-% frequency can be specified. At any given point, VNS is calcuated as a 
-% function of the current time step for the whole run. This is added to the
+% frequency can be specified. At any given point, VNS is calculated as a 
+% function of the current time step for the whole run. This is added to the 
 % NTS excitatory and inhibitory populations. To this end, the solver needs 
-% to keep an eye on the overall time step of the whole simulation.
-%
-% The output of this code is stored in a compact format that allows
-% calculation of seizure frequency and duration and also allows for
-% infrequent events to be readily reconstitiuted 
- 
+% to be given overall time step of the whole simulation.
+% 
+% The code can be parallelised (performing runs for more than parameter set 
+% at a time) with MATLAB Parallel Toolbox. If not using this, change the 
+% "parfor" loop on line *** to a "for" loop.
+
 close all
 clear
 
@@ -23,7 +31,7 @@ clear
 
 tic
 
-% SETUP PARAMS HERE!!!*****************************************************
+%% SETUP PARAMETERS
 maxExStim = 80;
 nExStims = 76;
 
@@ -32,51 +40,48 @@ nInStims = 1;
 % (In this example, as in the paper, there is no VNS stimulation applied to
 % the inhibitory population of the NTS)
 
-% Background NTS(Ex) and (Inh) input values before stim added
+% Background NTS(Ex) and (Inh) input values before any stimulation added.
 baseEx = -0.9;
 baseIn = -0.7;
 
 % set number of epochs
-nRuns = 100;
+nRuns = 100; % what was used for the examples in the paper.
+% nRuns = 1; % to run quickly for testing
 
 endtime = 100; % (simulated seconds for each section of epoch)  
-% (NOTE cannot compare runs runs where sections are different lengths as rng
-% seeding will be different!!)
+% (NOTE cannot compare runs runs where sections are different lengths as 
+% rng seeding will be different!! 100s used throughout paper)
 
 % frequency of VNS pulse in Hz (modelled as idealised square wave)
-freq = 30; % default of 30 Hz, as used in paper.
+freq = 30; % default of 30 Hz used in paper.
 
 % pulsewidth of VNS pulse, in microseconds 
 % (250 or 500 in real-life clinical setting)
-pulsewidth = 500; % as used in paper.
+pulsewidth = 500; % default of 500 used in paper.
 
 % add duty cycle information now for use if needed...
 cycleOn = 300; % (seconds: default 30)
-cycleOff = 300; %(default: 300)
-% (Note: setting both to the same number results in no off periods. This
+cycleOff = 300; % (default: 300)
+% (Note: setting both to the same number results in no off periods. These
 % are the parameters used in the paper)
 
-% value used on moving average for seizure detection threshold
-threshold = 0.15; 
-% (0.15 suitable if just sticking with S1 to calculate euclidean distance. 
-% Determined empirically. This setting was used in the paper)
+%% Other important settings go here:
 
-% *************************************************************************
+dt = 0.0001; % timestep: 0.0001s (100 microseconds) used throughout paper
 
-
-% Other important settings go here:
-
-dt = 0.0001; % (timestep)
-
-% use to switch dimensions contributing to Euclidean distance
-% calculation...
-% eucWeights = [1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0]; % (everything but NTS)
-eucWeights = [1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]; % (just S1)
+% Select the dimensions contributing to Euclidean distance calculation
+eucWeights = [1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]; 
+% (this setting considers only the S1 populations, as in the paper)
 
 % width of window for moving average calculations
 windowSecs = 2; % needs to be less than endtime
 halfwindow = floor(windowSecs/(2*dt));
 wyndoh = halfwindow*2 +1; % easier if consistently an odd integer
+
+% value used on moving average for seizure detection threshold
+threshold = 0.15; 
+% (0.15 suitable if using S1 populations to calculate euclidean distance. 
+% Determined empirically. This setting was used in the paper)
 
 % Calculate values of stim in Ex and Inh 
 gapEx = maxExStim/(nExStims-1);
@@ -87,36 +92,34 @@ stimInValues = 0:gapIn:maxInStim;
 % get and modify standard parameters
 p = read_default_params();
 
-% (anything else to pass to the function via 'p')
+% (further information that may be passed between functions, and ultimately
+% stored, can be put within the data structure, 'p')
+p.startedAt = datetime;
 p.dt = dt;
+p.endtime = endtime;
+p.nRuns = nRuns;
+
 p.windowSecs = windowSecs;
 p.threshold = threshold;
 p.eucWeights = eucWeights;
-p.endtime = endtime;
+
 p.freq = freq;
 p.pw = pulsewidth;
 p.cycleOff = cycleOff;
 p.cycleOn = cycleOn;
 
-% (then ammend any weights, offsets, noise scaling etc)
-p.w(4,21) = 0.08; % default = 0.08, but connectivity.mat value is 0.01
-p.w(4,15) = 0.01; % default = 0.01, but connectivity.mat value is ZERO
-p.h(21) = -1.5; 
-% (default = -0.9 but for now this is set here in order to calculate a
-% consistent value for the FP, based on earlier work)
+% If needed, ammend defuault settings of any weights, offsets etc here:
 
 % templates for noiseINJECTED
-noiseEX = repmat([1,0],1,11); 
-noiseON = ones(1,22);
-noiseOFF = zeros(1,22);
-noiseNTS = noiseOFF; noiseNTS(21) = 1;
-noisePY = noiseOFF; noisePY(1) = 1;
-noiseCustom1 = [1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1];
-noiseCustom2 = [1 0 0 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0];
-noiseCustom3 = [1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0];
+noiseEX  = [1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0];
+noiseON  = [1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1];
+noiseOFF = [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0];
+noiseNTS = [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0];
+noisePY  = [1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0];
+noiseTC  = [0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]; % (what we used)
 
 % Noise settings...
-nNoises = 1; % (sets the number of different noise levels that will be used)
+nNoises = 1; % (sets the number of different noise levels to use)
 noiseMaxScaler = 0.72;
 noiseMinScaler = 0;
 % This is set to produce the single noise scaler (effectively the standard
@@ -134,42 +137,52 @@ end
 p.noiseCHOICE = noiseCHOICE;
 p.noiseScalers = noiseScalers;
 
-% Initial condition sets:
-% (S1_PY, SI_IN, TC, RE, INS_EX, INS_IN, ACC_EX, ACC_IN, PFC_EX, PFC_IN, 
-% Amy_Ex, Amy_In, Hyp_Ex, Hyp_In, LoC_Ex, LoC_In, DRN_Ex, DRN_In, PB_Ex,
-% PB_In, STN_Ex, STN_In)
+%% Find precise FP and LC conditions 
+% (in the absence of noise or stimulation). 
+
+% The LC parameter is especially important for the detection of
+% seizure_like events. 
+
+% We have considered doing array of FP/LC conditions all parameter
+% combinations in the sweep. This would have possibly made seizure
+% detection more accurate, but is complicated by the problem that LC 
+% may not exist at many of these combinations. Where it exists, however,
+% the LC remains in a very similar position, as does the FP. For the
+% purposes of standardisation FP and LC are determined for h values of -1.5
+% for NTS_py and -3.4 for NTS_inh, set here:
+p.h(21) = -1.5; 
+
+nSteps = int32(10/p.dt + 1);  % (runs for 10 secs to reach equilibrium)
+p.stimVal = [0,0]; % (not used, but function needs these passing)
+p.noisevecs = zeros(nSteps, 22); 
+% (also not used, but function needs these passing too)
 
 nearFP = [0.1724,0.1787,-0.0818,0.2775,0.0724,0.0787,0.0724,0.0787,...
     0.0724,0.0787,0.0724,0.0787,0.0724,0.0787,0.0724,0.0787,0.0724,...
     0.0787,0.0724,0.0787,0.1724,0.1787];
+% (a starting state that reliably progresses to the fixed point - across a 
+% wide parameter range)
    
-nearLC = zeros(1,22);
-
-%% Find precise FP conditions (for current params, no noise, no stim) for measurements later
-
-% (We have debated doing array of FP/LC conditions all parameter
-% combinations in the sweep. This would have possibly made seizure
-% detection more accurate, but is complicated by the problem that LC or FP
-% will not exist at many of these combinations. A such, we are keeping the
-% original, lower dimension functions for this purpose. A bit inelegant,
-% but pragmatic...)
-nSteps = int32(10/p.dt + 1);  % (runs for 10 secs, done once in single dimension, so low overhead)
-p.stimVal = [0,0]; % Leave it!
-p.noisevecs = zeros(nSteps, 22);
 [~,uFP] = vectorised_eulersolver(@(t,uFP)VNSfn_stoch_vec_Euler_stim(t,uFP,p), nearFP, dt, 10);
 exactFP = uFP(end,:);
 
-% Find equilibrated LC conditions (for current params, no noise, no stim) once to save time later
+nearLC = zeros(1,22);
+% (a starting state that reliably progresses to the limit cycle - when it
+% exists - across a wide parameter range)
+
+% Find equilibrated LC conditions once to save time later
 [~,uLC] = vectorised_eulersolver(@(t,uLC)VNSfn_stoch_vec_Euler_stim(t,uLC,p), nearLC, dt, 10);
 LCstart = uLC(end,:);
 
-% set overlaps (used for accurately caculating moving means)
-origPreOverlap = uFP(end-halfwindow:end,:);
-
-% (reset n_steps for main loops)
+% reset for main loops
 nSteps = int32(endtime/p.dt);
 p.nSteps = nSteps;
 p.nNoises = nNoises;
+
+%% Set-up for Main Loop
+
+% set overlaps (used for accurately caculating moving means)
+origPreOverlap = uFP(end-halfwindow:end,:);
 
 % Set up the list of tuples
 listLength = nExStims * nInStims * nNoises;
@@ -202,9 +215,11 @@ sliceOne = listParamTuples(1,:);
 sliceTwo = listParamTuples(2,:);
 sliceNoise = listParamTuples(3,:);
 
-%% PARFOR LOOP STARTS HERE!
-% parfor lix = 1:listLength
-for lix = 1:listLength % replace with FOR if not parallelising
+%% Main Loop
+
+parfor lix = 1:listLength
+% for lix = 1:listLength 
+% (replace 'parfor' with 'for' if not parallelising)
 
     % state of system at end of run. Initiate at zero (no seizure)
     seizureFlag = 0;
@@ -261,17 +276,20 @@ for lix = 1:listLength % replace with FOR if not parallelising
         eucs = eucliser(stitched, eucWeights, exactFP);
         
         % get moving averages
-        % (currently moving mean but could convolve with hamming/hann window etc?)
         smooth_eucs = movmean(eucs,wyndoh);
         
         % trim ends to length...
-        % (would need to cut off more if using convolution)
         smooth_eucs = smooth_eucs(halfwindow+1:end-halfwindow-1,:);
     
         % apply thresholding
         isitoverthrshld = smooth_eucs > threshold;
     
-        % (New method...)
+        % A and B are two copies of 'isitoverthrshld', with the values of B
+        % shifted by one position. 
+        % Let C equal A minus B, then:
+        % a value of +1 implies a seizure start, 
+        % a value of -1 implies a seizure end, and
+        % a value of zero implies no change. 
         A = isitoverthrshld;
         B = A;
         B(2:end) = B(1:end-1);
@@ -304,19 +322,20 @@ for lix = 1:listLength % replace with FOR if not parallelising
 
     end % (of seed/epoch)
 
-    % assemble results here!!
+    % assemble results here
     linearResults{lix} = localResult;
 
-end % (of parfor loop!)
+end % (of Main Loop)
+
+%% Pack up and save results.
 
 % Fold up linearResults...    
 foldedResults(:) = linearResults(:);
 
-% and initStates...
+% ...and initStates.
 initStatesFolded(:) = initStates(:); 
 
 p.tock = toc;
-toc
 
 % Save the data tidily:
 
@@ -331,7 +350,6 @@ p.foldedResults = foldedResults;
 p.init_states = initStatesFolded;
 
 p.title = strcat("VNS_stim_output_", string(floor((now-738000)*1000)));
-% (p.title is a general stem for for related plots etc. Therefore saved with data)
-fulltitle = [p.title, '.mat'];
+% (a general stem for for related plots etc. Therefore saved with data)
 
 save(p.title,'p')
