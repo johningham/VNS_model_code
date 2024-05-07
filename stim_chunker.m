@@ -1,6 +1,7 @@
 % For fixed background input to NTS populations, and with other parameters 
 % also fixed, this code will run a series of stochastic simulations, using 
-% the same noise series, for different VNS amplitudes. 
+% the same noise series, for different VNS amplitudes. There is a great
+% deal of duplicated code from 'no_stim_chunker.m'
 % 
 % Combinations of different stimulation levels for both the excitatory and 
 % inhibitory populations, although the example given here has all the 
@@ -22,7 +23,7 @@
 % 
 % The code can be parallelised (performing runs for more than parameter set 
 % at a time) with MATLAB Parallel Toolbox. If not using this, change the 
-% "parfor" loop on line *** to a "for" loop.
+% "parfor" loop, on line 226, to a "for" loop.
 
 close all
 clear
@@ -33,6 +34,7 @@ clear
 tic
 
 %% SETUP PARAMETERS
+
 maxExStim = 80;
 nExStims = 76;
 
@@ -77,7 +79,7 @@ eucWeights = [1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0];
 % width of window for moving average calculations
 windowSecs = 2; % needs to be less than endtime
 halfwindow = floor(windowSecs/(2*dt));
-wyndoh = halfwindow*2 +1; % easier if consistently an odd integer
+wyndoh = halfwindow * 2 +1; % easier if consistently an odd integer
 
 % value used on moving average for seizure detection threshold
 threshold = 0.15; 
@@ -125,6 +127,7 @@ noiseMaxScaler = 0.72;
 noiseMinScaler = 0;
 % This is set to produce the single noise scaler (effectively the standard
 % deviation of the noise) of 0.72 that is used in the paper.
+
 noiseCHOICE = noisePY;
 
 % allow for single value of noise scaler (equal to Max)
@@ -251,11 +254,13 @@ parfor lix = 1:listLength
         tp.noisevecs = baseNoise .* noiseCHOICE .* noiseScaler; 
         % (overwrites previous value)
 
-        % additional info to pass to function
+        % additional info to pass to VNS_stim_fn 
+        % (for for global timestep calculation)
         tp.epoch = seed;
-    
+  
         % send everything to the solver...
-        [~,u] = vectorised_eulersolver(@(t,u)VNS_stim_fn(t,u,tp), newInitState, dt, endtime);
+        [~,u] = vectorised_eulersolver(@(t,u)VNS_stim_fn(t,u,tp), ...
+            newInitState, dt, endtime);
 
         % revise new initial states for next iteration
         newInitState = u(end,:);
@@ -360,5 +365,7 @@ p.init_states = initStatesFolded;
 
 p.title = strcat("VNS_stim_output_", string(floor((now-738000)*1000)));
 % (a general stem for for related plots etc. Therefore saved with data)
+p.runUnder = mfilename;
+p.finishedAt = datetime;
 
 save(p.title,'p')
