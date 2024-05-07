@@ -8,8 +8,9 @@
 % 
 % Due to RAM constraints, continuous runs are divided into epochs, each 
 % starting with a consecutive noise seed. The output of this code is stored 
-% in a compact format as the starting timestep and duration of each seizure 
-% event, as well as the initial conditions. From this we can calculate 
+% in a compact format as arrays of tuples of varying length, recording the
+% the starting timestep (for entire run) and duration of each seizure 
+% event, as well as the initial conditions. From these we can calculate 
 % seizure frequency and duration also reconstitute sections of the time 
 % series of interest.
 % 
@@ -52,11 +53,11 @@ endtime = 100; % (simulated seconds for each section of epoch)
 % (NOTE cannot compare runs runs where sections are different lengths as 
 % rng seeding will be different!! 100s used throughout paper)
 
-% frequency of VNS pulse in Hz (modelled as idealised square wave)
+% frequency of VNS pulse, in Hz (modelled as idealised square wave)
 freq = 30; % default of 30 Hz used in paper.
 
-% pulsewidth of VNS pulse, in microseconds 
-% (250 or 500 in real-life clinical setting)
+% Pulsewidth of VNS pulse, in microseconds 
+% (typically 250 or 500 in real-life clinical setting)
 pulsewidth = 500; % default of 500 used in paper.
 
 % add duty cycle information now for use if needed...
@@ -108,9 +109,9 @@ p.pw = pulsewidth;
 p.cycleOff = cycleOff;
 p.cycleOn = cycleOn;
 
-% If needed, ammend defuault settings of any weights, offsets etc here:
+% If needed, ammend default settings of any weights, offsets etc here:
 
-% templates for noiseINJECTED
+% Templates for noiseINJECTED
 noiseEX  = [1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0];
 noiseON  = [1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1];
 noiseOFF = [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0];
@@ -163,7 +164,8 @@ nearFP = [0.1724,0.1787,-0.0818,0.2775,0.0724,0.0787,0.0724,0.0787,...
 % (a starting state that reliably progresses to the fixed point - across a 
 % wide parameter range)
    
-[~,uFP] = vectorised_eulersolver(@(t,uFP)VNSfn_stoch_vec_Euler_stim(t,uFP,p), nearFP, dt, 10);
+[~,uFP] = vectorised_eulersolver ...
+    (@(t,uFP)VNSfn_stoch_vec_Euler_stim(t,uFP,p), nearFP, dt, 10);
 exactFP = uFP(end,:);
 
 nearLC = zeros(1,22);
@@ -171,7 +173,8 @@ nearLC = zeros(1,22);
 % exists - across a wide parameter range)
 
 % Find equilibrated LC conditions once to save time later
-[~,uLC] = vectorised_eulersolver(@(t,uLC)VNSfn_stoch_vec_Euler_stim(t,uLC,p), nearLC, dt, 10);
+[~,uLC] = vectorised_eulersolver ...
+    (@(t,uLC)VNSfn_stoch_vec_Euler_stim(t,uLC,p), nearLC, dt, 10);
 LCstart = uLC(end,:);
 
 % reset for main loops
@@ -234,16 +237,19 @@ parfor lix = 1:listLength
 
     for seed = 1:nRuns
         
-        % work out how many timesteps have elapsed before current epoch
+        % Work out how many timesteps have elapsed before current epoch
         tot_steps2epoch = (seed - 1) * nSteps;
     
-        % save initial state
+        % Save initial state
         initStates(lix,seed,:) = newInitState;
         
-        % make some noise
-        rng(seed, 'twister') % specifying algorithm keeps consistent between for and parfor loops
+        % Make some noise
+        rng(seed, 'twister') 
+        % (specifying algorithm keeps consistent between for and parfor
+        % loops)
         baseNoise = randn(nSteps, 22);
-        tp.noisevecs = baseNoise .* noiseCHOICE .* noiseScaler; % (overwrites previous val)
+        tp.noisevecs = baseNoise .* noiseCHOICE .* noiseScaler; 
+        % (overwrites previous value)
 
         % additional info to pass to function
         tp.epoch = seed;
@@ -257,7 +263,8 @@ parfor lix = 1:listLength
         % calculate overlaps...
         rng(seed+1, 'twister')
         baseNoise = randn(nSteps, 22);
-        tp.noisevecs = baseNoise .* noiseCHOICE .* noiseScaler; % (overwrites previous val)
+        tp.noisevecs = baseNoise .* noiseCHOICE .* noiseScaler; 
+        % (overwrites previous value)
         tOverlap = halfwindow * tp.dt;
     
         % back to the solver...
@@ -270,8 +277,9 @@ parfor lix = 1:listLength
         % revise pre_overlap for next iteration
         preOverlap = u(end-halfwindow:end,:);
         
-        % Analysis of segment (euclidean distances, moving averages, pruning, thresholding,
-        % coding):    
+        % Analysis of segment (euclidean distances, moving averages, 
+        % pruning, thresholding, coding):    
+
         % get euclidean distances...
         eucs = eucliser(stitched, eucWeights, exactFP);
         
@@ -287,9 +295,9 @@ parfor lix = 1:listLength
         % A and B are two copies of 'isitoverthrshld', with the values of B
         % shifted by one position. 
         % Let C equal A minus B, then:
-        % a value of +1 implies a seizure start, 
-        % a value of -1 implies a seizure end, and
-        % a value of zero implies no change. 
+        %  a value of +1 implies a seizure start, 
+        %  a value of -1 implies a seizure end, and
+        %  a value of zero implies no change in seizure state. 
         A = isitoverthrshld;
         B = A;
         B(2:end) = B(1:end-1);
@@ -304,7 +312,8 @@ parfor lix = 1:listLength
         end
         
         lengths = offs - ons;
-        fragmentResult = [zeros(2,0), [ons';lengths']]; % (forces consistent dims)
+        fragmentResult = [zeros(2,0), [ons';lengths']]; 
+        % (forces consistent dimensions)
     
         % (join contiguous seizure elements)
         if seizureFlag == 1 && isitoverthrshld(1) == 1 
