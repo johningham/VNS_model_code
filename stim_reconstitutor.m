@@ -1,5 +1,12 @@
-% Takes an output file from stim_chunker.m and reconstitutes part of the
-% time series for a specified interval and combination of parameters.
+% Takes an output file from 'stim_chunker.m' and reconstitutes parts of the
+% time series that may be of interest for a specified start point, 
+% duration, and combination of parameters. Figure 3 in the paper was also
+% made using this script, by setting the VNS stimulation amplitude to zero.
+% 
+% The code outputs not only time series of the mean S1 populations' time
+% series, but also the euclidean distance from the FP, and the smoothed
+% version of this used in the seizure detector. This was used in the
+% supplementary figure that explained the seizure detection process.
 
 close all
 clear
@@ -9,17 +16,23 @@ load('VNS_stim_output_1147915.mat') % data for use in final paper
 savePlots = false;
 saveData = false;
 
-% choose from available param combinations and specify start time and
-% duration
-Oix = 2;
+% Choose from available param combinations and specify start time and
+% duration:
+Oix = 2; 
+% (index of parameter One - excitatory component of VNS - low value of 0.2)
 Tix = 1;
+% (index of parameter Two - inhibitory. Zero is the only value in this set)
 Nix = 1;
+% (index of the noise scaler value - only one used in this instance: 0.72)
 startStep =  245628404;
 durStep = 433520;
 
+% Set number of timesteps to reconstruct and plot before and after the
+% interval of interest.
 startmargin = 50000;
 endmargin = 100000;
 
+% Fix Y-axis limits
 topEdge = 0.5;
 bottomEdge = -0.1;
 
