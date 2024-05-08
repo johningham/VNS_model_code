@@ -49,7 +49,7 @@ endtime = p.endtime;
 
 stimExVal = p.stimExVals(Oix);
 stimInVal = p.stimInVals(Tix);
-noiseval = p.noiseScalers(Nix);
+noiseScaler = p.noiseScalers(Nix);
 
 windsecs = p.windowSecs;
 halfwindow = floor(windsecs/(2*dt));
@@ -74,7 +74,7 @@ velocaltimestep = veryend - ((veepoch-1) * nStps);
 initsOTNER = p.init_states; % (paramOne, paramTwo, Noise, Epoch, Region)
 initsER = permute((initsOTNER(Oix,Tix,Nix,:,:)),[4 5 1 2 3]);
 
-%% Find precise FP conditions (transferred)
+%% Find precise FP conditions
 % (in the absence of noise or stimulation). 
 
 % We have considered doing array of FP conditions for all parameter
@@ -103,7 +103,7 @@ exactFP = uFP(end,:);
 %% Remaining Setup
 
 % noise 
-p.AffIn = p.noiseCHOICE * noiseval;
+p.AffIn = p.noiseCHOICE * noiseScaler;
 
 % initiate long time series
 compositeSeries = zeros(0,22);
@@ -138,7 +138,8 @@ p.stimVal = [stimExVal stimInVal];
 for seed = vsepoch:veepoch
     p.epoch = seed;
     rng(seed, 'twister')
-    p.noisevecs = randn(nStps, 22) .* p.AffIn; % (overwrites previous val)
+    p.noisevecs = randn(nStps, 22) .* p.noiseCHOICE .* noiseScaler; 
+    % (overwrites previous value)
     
     % get the relevant initial conditions to start the epoch
     thisinit = initsER((seed),:);
@@ -155,7 +156,9 @@ end
 seed = seed + 1;
 p.epoch = seed;
 rng(seed, 'twister')
-p.noisevecs = randn(nStps, 22) .* p.AffIn; % (overwrites previous val)
+
+p.noisevecs = randn(nStps, 22) .* p.noiseCHOICE .* noiseScaler; 
+% (overwrites previous value)
 
 % get the relevant initial conditions to start the epoch
 thisinit = compositeSeries(end,:);
@@ -255,7 +258,7 @@ f3.Position = [400 400 2000 700];
 
 % Package data for optional save, and create title for optional data and
 % figure saves...
-q.noiseval = noiseval;
+q.noiseval = noiseScaler;
 q.w = p.w;
 q.h = p.h;
 q.a = p.a;
