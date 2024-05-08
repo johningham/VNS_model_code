@@ -116,10 +116,10 @@ p.noiseScalers = noiseScalers;
 %% Find precise FP and LC conditions 
 % (in the absence of noise or stimulation). 
 
-% The LC parameter is especially important for the detection of
-% seizure_like events. 
+% The FP state is especially important for the detection of seizure-like 
+% events.
 
-% We have considered doing array of FP/LC conditions all parameter
+% We have considered doing array of FP/LC conditions for all parameter
 % combinations in the sweep. This would have possibly made seizure
 % detection more accurate, but is complicated by the problem that LC 
 % may not exist at many of these combinations. Where it exists, however,
