@@ -7,6 +7,8 @@
 % series, but also the euclidean distance from the FP, and the smoothed
 % version of this used in the seizure detector. This was used in the
 % supplementary figure that explained the seizure detection process.
+% The code also outputs a figure time series for the remainin regions
+% for the same period
 
 close all
 clear
@@ -36,7 +38,7 @@ endmargin = 100000;
 topEdge = 0.5;
 bottomEdge = -0.1;
 
-% Start needs to be no bigger than pre-calc timesteps 
+% needs to be no bigger than pre-calc timesteps 
 
 endStep = startStep + durStep;
 
@@ -52,7 +54,7 @@ noiseval = p.noiseScalers(Nix);
 windsecs = p.windowSecs;
 halfwindow = floor(windsecs/(2*dt));
 wyndoh = halfwindow*2 +1; % (easier if consistently an odd integer)
-clear("nStps")
+clear('nStps')
 nStps = cast(p.nSteps,'double');
 
 leftEdge = startStep - startmargin; % (x-limits of plot)
@@ -61,7 +63,9 @@ rightEdge = endStep+endmargin;
 verystart = cast((startStep - startmargin - halfwindow),'double');
 veryend = cast((startStep + durStep + endmargin + halfwindow), 'double');
 
-vsepoch = cast(floor(verystart/nStps),'double') + 1; % epochs numbered from one. Seed = epoch 
+vsepoch = cast(floor(verystart/nStps),'double') + 1; 
+% (epochs numbered from one. Seed = epoch) 
+
 vslocaltimestep = verystart - ((vsepoch-1) * nStps); 
 
 veepoch = cast((floor(veryend/nStps) + 1), 'double'); 
@@ -70,36 +74,33 @@ velocaltimestep = veryend - ((veepoch-1) * nStps);
 initsOTNER = p.init_states; % (paramOne, paramTwo, Noise, Epoch, Region)
 initsER = permute((initsOTNER(Oix,Tix,Nix,:,:)),[4 5 1 2 3]);
 
+%% Find precise FP conditions (transferred)
+% (in the absence of noise or stimulation). 
 
+% We have considered doing array of FP conditions for all parameter
+% combinations in the sweep. This may have made seizure
+% detection more accurate, but had some complications. However,
+% the FP remains in a very similar position throughout the range. For the
+% purposes of standardisation FP and LC are determined for h values of -1.5
+% for NTS_py and -3.4 for NTS_inh, set here:
+p.h(21) = -1.5; 
 
-%% Find precise FP
+nSteps = int32(10/p.dt + 1);  % (runs for 10 secs to reach equilibrium)
+p.stimVal = [0,0]; % (not used, but function needs these passing)
+p.noisevecs = zeros(nSteps, 22); 
+% (also not used, but function needs these passing too)
 
-% (We have debated doing array of FP/LC conditions all parameter
-% combinations in the sweep. This would have possibly made seizure
-% detection more accurate, but is complicated by the problem that LC or FP
-% will not exist at many of these combinations. A such, we are keeping the
-% original, lower dimension functions for this purpose. A bit inelegant,
-% but pragmatic...)
-
-% Initial condition sets:
-% (S1_PY, SI_IN, TC, RE, INS_EX, INS_IN, ACC_EX, ACC_IN, PFC_EX, PFC_IN, 
-% Amy_Ex, Amy_In, Hyp_Ex, Hyp_In, LC_Ex, LC_In, DRN_Ex, DRN_In, PB_Ex,
-% PB_In, STN_Ex, STN_In)
-
-% Find exact FP (runs for 10 secs, done once in single dimension)
 nearFP = [0.1724,0.1787,-0.0818,0.2775,0.0724,0.0787,0.0724,0.0787,...
     0.0724,0.0787,0.0724,0.0787,0.0724,0.0787,0.0724,0.0787,0.0724,...
     0.0787,0.0724,0.0787,0.1724,0.1787];
-nStps = int32(10/p.dt + 1);  
-p.stimVal = [0,0]; % (Not used but needs to be set)
-p.noisevecs = zeros(nStps, 22);
-[~,uFP] = vectorised_eulersolver(@(t,uFP)VNSfn_stoch_vec_Euler_stim(t,uFP,p), nearFP, dt, 10);
+% (a starting state that reliably progresses to the fixed point - across a 
+% wide parameter range)
+
+[~,uFP] = vectorised_eulersolver ...
+    (@(t,uFP)VNSfn_stoch_vec_Euler_stim(t,uFP,p), nearFP, dt, 10);
 exactFP = uFP(end,:);
 
-% Find equilibrated LC conditions (for current params, no noise, no stim) once to save time later
-nearLC = zeros(1,22);
-[~,uLC] = vectorised_eulersolver(@(t,uLC)VNSfn_stoch_vec_Euler_stim(t,uLC,p), nearLC, dt, 10);
-LCstart = uLC(end,:);
+%% Remaining Setup
 
 % noise 
 p.AffIn = p.noiseCHOICE * noiseval;
