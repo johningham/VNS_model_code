@@ -204,27 +204,26 @@ f1 = gcf;
 f1.Position = [200 200 2000 700];
 
 %% Plotting other regions
-stepsToPlot = size(seriesSteps,2);
-LFP_Ex = zeros(stepsToPlot, 11);
-LFP_In = zeros(stepsToPlot, 11);
-count = 1;
+figure(2)
 
-for i = 1:2:21
-    LFP_Ex(:,count) = compositeSeries(:,i);
-    LFP_In(:,count) = compositeSeries(:,i+1);
-    count=count+1;
+stepsToPlot = size(seriesSteps,2);
+ex_pops = zeros(stepsToPlot, 11);
+in_pops = zeros(stepsToPlot, 11);
+
+for i = 1:10
+    ex_pops(:,i) = compositeSeries(:,2*i + 1);
+    in_pops(:,i) = compositeSeries(:,2*i + 2);
 end
 
-lineUpForMean = cat(3, LFP_Ex,LFP_In);
+lineUpForMean = cat(3, ex_pops,in_pops);
 LFPs = mean(lineUpForMean, 3);
-reg_name = ["S1","Thalamus","Insula","ACC","PFC","Amygdala","Hypothal", ...
+reg_name = ["Thalamus","Insula","ACC","PFC","Amygdala", "Hypothalamus", ...
     "LC","DRN","PB","NST"];
-figure(2)
 
 for i = 1:10
     subplot(5,2,i)
-    plot(seriesSteps,LFPs(:,i+1))
-    title(reg_name(:,i+1))
+    plot(seriesSteps,LFPs(:,i))
+    title(reg_name(:,i))
     xline(startStep)
     xline(endStep)
     xlim([leftEdge rightEdge])
@@ -232,6 +231,7 @@ for i = 1:10
     xticklabels([startSecs, endSecs])
     xlabel('time (s)')
 end
+
 f2 = gcf;
 f2.Position = [300 300 1600 800];
 
