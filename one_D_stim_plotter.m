@@ -1,15 +1,23 @@
-% Takes output file from 
-
+% Takes output file from 'stim_chunker.m' and produces plots of both
+% seizure frequency, and proportion of total time in spent in seizure,
+% against the amplitude of the VNS applied to the the excitatory NTS 
+% population (ultimately, the only one we applied it to). The latter plot
+% was used in Figure 4 of the paper. 
 
 clear
 close all
 
+% set "true" to save plots
+savePlots = false;
+
+% set save path ******
+
 % load output file from which to draw plots... 
 load('VNS_stim_output_1147915.mat') % (as used in final paper)
 
-dotColour = [0.6350 0.0780 0.1840];
+dotColour = [0.6350 0.0780 0.1840]; % (sort of maroon?)
 
-% Specify index of the noise scaler value to use (only one in this example)
+% Specify index of the noise scaler value to use (only one in this dataset)
 noiseIx = 1;
     
 tot_timesteps = p.n_runs * p.nSteps; 
@@ -43,9 +51,6 @@ s1.MarkerSize = 8;
 s1.MarkerFaceColor = dotColour;
 ylim([0, 1])
 f1.Position = [700 400 900 200];
-% saveas(gcf,strcat(p.title, 'Numb.png'))
-% saveas(gcf,strcat(p.title, 'Numb.fig'))
-% saveas(gcf,strcat(p.title, 'Numb.eps'))
 
 f2 = figure(2);
 s2 = plot(ex_vals,pc_dur_seizures,'o');
@@ -56,6 +61,12 @@ s2.MarkerSize = 8;
 s2.MarkerFaceColor = dotColour;
 ylim([0, 0.4])
 f2.Position = [700 100 900 200];
-% saveas(gcf,strcat(p.title, 'Pc.png'))
-% saveas(gcf,strcat(p.title, 'Pc.fig'))
-% saveas(gcf,strcat(p.title, 'Pc.eps'))
+
+
+% saveas(f1,strcat(p.title, 'Numb.png'))
+% saveas(f1,strcat(p.title, 'Numb.fig'))
+% saveas(f1,strcat(p.title, 'Numb.eps'))
+
+% saveas(f2,strcat(p.title, 'Pc.png'))
+% saveas(f2,strcat(p.title, 'Pc.fig'))
+% saveas(f2,strcat(p.title, 'Pc.eps'))
