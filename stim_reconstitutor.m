@@ -8,7 +8,9 @@
 % version of this used in the seizure detector. This was used in the
 % supplementary figure that explained the seizure detection process.
 % The code also outputs a figure of time series for the remaining regions
-% over the same period with the same parameters.
+% over the same period with the same parameters and a final figure showing
+% a phase plot of the S1 populations, also used in the supplementary
+% figure.
 
 close all
 clear
@@ -187,7 +189,7 @@ startSecs = startStep * dt;
 endSecs = endStep * dt;
 
 % plot S1 (included threshold, start of noise if relevant etc)
-figure(1)
+f1 = figure(1);
 hold on 
 plot(seriesSteps, LFP)
 plot(seriesSteps, eucs)
@@ -200,11 +202,11 @@ xticks([startStep, endStep])
 xticklabels([startSecs, endSecs])
 xlabel('time (s)')
 ylim([bottomEdge topEdge])
-f1 = gcf;
+% f1 = gcf;
 f1.Position = [200 200 2000 700];
 
 %% Plotting other regions
-figure(2)
+f2 = figure(2);
 
 stepsToPlot = size(seriesSteps,2);
 ex_pops = zeros(stepsToPlot, 11);
@@ -232,7 +234,7 @@ for i = 1:10
     xlabel('time (s)')
 end
 
-f2 = gcf;
+% f2 = gcf;
 f2.Position = [300 300 1600 800];
 
 % Cleaner version of S1 plot
@@ -250,7 +252,7 @@ xlabel('time (s)')
 f3 = gcf;   
 f3.Position = [400 400 2000 700];
 
-% Package data for optional save, and create title for optional data and
+%% Package data for optional save, and create title for optional data and
 % figure saves...
 q.noiseval = noiseScaler;
 q.w = p.w;
@@ -289,4 +291,52 @@ if savePlots
     saveas(f3,strcat(q.title, '_clean.fig'))
     saveas(f3,strcat(q.title, '_clean.eps'))
     saveas(f3,strcat(q.title, '_clean.svg'))
+end
+
+%% Phase plot
+
+% load('shortNoisySeries.mat')
+
+start = 50000;
+fin = 80000;
+
+f4 = figure(4);
+hold on
+
+h1 = plot(compositeSeries(start:fin,1), compositeSeries(start:fin,2));
+h1.Color = [.4 .4 .4];
+h1.LineWidth = 1;
+
+% Show Fixed Point as blue dot
+h2 = plot(exactFP(1), exactFP(2), 'o');
+h2.Color = 'b';
+
+h2.MarkerSize = 8;
+h2.MarkerFaceColor = 'b';
+
+% legend('LC','FP', Location = 'north')
+
+ylabel('S1 Py')
+xlabel('S1 Inh')
+
+%% Show Limit Cycle in with red dashed line
+% (put at the end to avoid interfering with 
+load('shortCleanSeries.mat') 
+% (presaved segment of LC under our standard conditions, with no noise and
+% no VNS)
+
+howFarRound = 3370;
+% (ensures dashed line not overdrawn by using only one period of LC)
+
+h3 = plot(clean_composite_series(1:howFarRound,1), clean_composite_series(1:howFarRound,2));
+h3.Color = [1,0,0,0.5];
+h3.LineWidth = 3;
+h3.LineStyle = ":";
+
+% save plot if set to do so
+if savePlots
+    saveas(f4,strcat(q.title, '_phase.png'))
+    saveas(f4,strcat(q.title, '_phase.fig'))
+    saveas(f4,strcat(q.title, '_phase.eps'))
+    saveas(f4,strcat(q.title, '_phase.svg'))
 end
