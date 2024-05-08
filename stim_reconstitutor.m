@@ -1,16 +1,18 @@
 % Takes an output file from 'stim_chunker.m' and reconstitutes parts of the
 % time series that may be of interest for a specified start point, 
-% duration, and combination of parameters. Figure 3 in the paper was also
-% made using this script, by setting the VNS stimulation amplitude to zero.
+% duration, and combination of parameters. 
 % 
 % The code outputs not only time series of the mean S1 populations' time
 % series, but also the euclidean distance from the FP, and the smoothed
-% version of this used in the seizure detector. This was used in the
-% supplementary figure that explained the seizure detection process.
+% version of this used in the seizure detector. This code was used on
+% similar data to produce the supplementary figure that explained the 
+% seizure detection process.
+
 % The code also outputs a figure of time series for the remaining regions
-% over the same period with the same parameters and a final figure showing
-% a phase plot of the S1 populations, also used in the supplementary
-% figure.
+% over the same period with the same parameters, a version of the time
+% time raw S1 time series (without euclidean distance information), and a 
+% final figure showing a phase plot of the S1 populations, again similar to
+% the one used in the supplementary figure.
 
 close all
 clear
@@ -252,8 +254,46 @@ xlabel('time (s)')
 f3 = gcf;   
 f3.Position = [400 400 2000 700];
 
+%% Phase plot
+
+start = 1;
+fin = 100000;
+
+f4 = figure(4);
+hold on
+
+h1 = plot(compositeSeries(start:fin,1), compositeSeries(start:fin,2));
+h1.Color = [.4 .4 .4];
+h1.LineWidth = 1;
+
+% Show Fixed Point as blue dot
+h2 = plot(exactFP(1), exactFP(2), 'o');
+h2.Color = 'b';
+
+h2.MarkerSize = 8;
+h2.MarkerFaceColor = 'b';
+
+ylabel('S1 Py')
+xlabel('S1 Inh')
+
+% Show Limit Cycle in with red dashed line
+load('shortCleanSeries.mat') 
+% (presaved segment of LC under our standard conditions, with no noise and
+% no VNS)
+
+howFarRound = 3370;
+% (ensures dashed line not overdrawn by using only one period of LC)
+
+h3 = plot(clean_composite_series(1:howFarRound,1), clean_composite_series(1:howFarRound,2));
+h3.Color = [1,0,0,0.5];
+h3.LineWidth = 3;
+h3.LineStyle = ":";
+
+legend('','FP','LC', Location = 'northwest')
+
 %% Package data for optional save, and create title for optional data and
 % figure saves...
+
 q.noiseval = noiseScaler;
 q.w = p.w;
 q.h = p.h;
@@ -291,50 +331,6 @@ if savePlots
     saveas(f3,strcat(q.title, '_clean.fig'))
     saveas(f3,strcat(q.title, '_clean.eps'))
     saveas(f3,strcat(q.title, '_clean.svg'))
-end
-
-%% Phase plot
-
-% load('shortNoisySeries.mat')
-
-start = 50000;
-fin = 80000;
-
-f4 = figure(4);
-hold on
-
-h1 = plot(compositeSeries(start:fin,1), compositeSeries(start:fin,2));
-h1.Color = [.4 .4 .4];
-h1.LineWidth = 1;
-
-% Show Fixed Point as blue dot
-h2 = plot(exactFP(1), exactFP(2), 'o');
-h2.Color = 'b';
-
-h2.MarkerSize = 8;
-h2.MarkerFaceColor = 'b';
-
-% legend('LC','FP', Location = 'north')
-
-ylabel('S1 Py')
-xlabel('S1 Inh')
-
-%% Show Limit Cycle in with red dashed line
-% (put at the end to avoid interfering with 
-load('shortCleanSeries.mat') 
-% (presaved segment of LC under our standard conditions, with no noise and
-% no VNS)
-
-howFarRound = 3370;
-% (ensures dashed line not overdrawn by using only one period of LC)
-
-h3 = plot(clean_composite_series(1:howFarRound,1), clean_composite_series(1:howFarRound,2));
-h3.Color = [1,0,0,0.5];
-h3.LineWidth = 3;
-h3.LineStyle = ":";
-
-% save plot if set to do so
-if savePlots
     saveas(f4,strcat(q.title, '_phase.png'))
     saveas(f4,strcat(q.title, '_phase.fig'))
     saveas(f4,strcat(q.title, '_phase.eps'))
