@@ -7,14 +7,15 @@
 % series, but also the euclidean distance from the FP, and the smoothed
 % version of this used in the seizure detector. This was used in the
 % supplementary figure that explained the seizure detection process.
-% The code also outputs a figure time series for the remainin regions
-% for the same period
+% The code also outputs a figure of time series for the remaining regions
+% over the same period with the same parameters.
 
 close all
 clear
 
 load('VNS_stim_output_1147915.mat') % data for use in final paper
 
+% settings for plot and data saving
 savePlots = false;
 saveData = false;
 
@@ -31,14 +32,12 @@ durStep = 433520;
 
 % Set number of timesteps to reconstruct and plot before and after the
 % interval of interest.
-startmargin = 50000;
+startmargin = 50000; % (needs to be no longer than pre-calc timesteps)
 endmargin = 100000;
 
 % Fix Y-axis limits
 topEdge = 0.5;
 bottomEdge = -0.1;
-
-% needs to be no bigger than pre-calc timesteps 
 
 endStep = startStep + durStep;
 
@@ -64,7 +63,7 @@ verystart = cast((startStep - startmargin - halfwindow),'double');
 veryend = cast((startStep + durStep + endmargin + halfwindow), 'double');
 
 vsepoch = cast(floor(verystart/nStps),'double') + 1; 
-% (epochs numbered from one. Seed = epoch) 
+% (epochs numbered from one) 
 
 vslocaltimestep = verystart - ((vsepoch-1) * nStps); 
 
@@ -102,13 +101,10 @@ exactFP = uFP(end,:);
 
 %% Remaining Setup
 
-% noise 
-p.AffIn = p.noiseCHOICE * noiseScaler;
-
 % initiate long time series
 compositeSeries = zeros(0,22);
 
-% handle calculations that need to start before time point zero
+% Handle calculations that need to start before time point zero
 % (use FP calculating steps - datum keeps track of start point)
 if vsepoch == 0
     compositeSeries = cat(1,compositeSeries,uFP); 
@@ -142,10 +138,10 @@ for seed = vsepoch:veepoch
     % (overwrites previous value)
     
     % get the relevant initial conditions to start the epoch
-    thisinit = initsER((seed),:);
+    this_init = initsER((seed),:);
 
     % send to solver
-    [~,u] = vectorised_eulersolver(@(t,u)VNS_stim_fn(t,u,p), thisinit, ... 
+    [~,u] = vectorised_eulersolver(@(t,u)VNS_stim_fn(t,u,p), this_init, ... 
         dt, endtime-dt);
 
     % append result to long time series
@@ -161,11 +157,11 @@ p.noisevecs = randn(nStps, 22) .* p.noiseCHOICE .* noiseScaler;
 % (overwrites previous value)
 
 % get the relevant initial conditions to start the epoch
-thisinit = compositeSeries(end,:);
+this_init = compositeSeries(end,:);
 
 % send to solver
 [~,u] = vectorised_eulersolver(@(t,u)VNSfn_stoch_vec_Euler_stim(t,u,p), ...
-    thisinit, dt, endtime-dt);
+    this_init, dt, endtime-dt);
 
 % append result to long time series
 compositeSeries = cat(1,compositeSeries,u); 
@@ -178,9 +174,6 @@ eucs = eucliser(compositeSeries, p.eucWeights, exactFP);
 
 % get moving averages
 smooth_eucs = movmean(eucs,wyndoh);
-
-% trim ends to length...
-% smooth_eucs = smooth_eucs(halfwindow+1:end-halfwindow-1,:);
 
 % chop everything to length
 seriesSteps = leftEdge:rightEdge;
@@ -215,18 +208,19 @@ stepsToPlot = size(seriesSteps,2);
 LFP_Ex = zeros(stepsToPlot, 11);
 LFP_In = zeros(stepsToPlot, 11);
 count = 1;
+
 for i = 1:2:21
     LFP_Ex(:,count) = compositeSeries(:,i);
     LFP_In(:,count) = compositeSeries(:,i+1);
     count=count+1;
 end
+
 lineUpForMean = cat(3, LFP_Ex,LFP_In);
 LFPs = mean(lineUpForMean, 3);
 reg_name = ["S1","Thalamus","Insula","ACC","PFC","Amygdala","Hypothal", ...
     "LC","DRN","PB","NST"];
 figure(2)
-% showing all regions, there are 11, but we are plotting the cortical S1
-% traces in figure 1 so missing that.
+
 for i = 1:10
     subplot(5,2,i)
     plot(seriesSteps,LFPs(:,i+1))
@@ -276,7 +270,7 @@ q.title = strcat(p.title, '_from_', string(startStep), '_for_', ...
     string(durStep), '_on_', string(Oix), '_', string(Tix), '_', ...
     string(Nix), '_ts');
 
-% If required,save data...
+% If required, save data...
 if saveData
  save(q.title,'q')
 end
