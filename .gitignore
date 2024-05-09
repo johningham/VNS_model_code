@@ -4,3 +4,4 @@
 *.fig
 *.pns
 *.svg
+/saved_output
