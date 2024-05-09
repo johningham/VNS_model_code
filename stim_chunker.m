@@ -362,10 +362,14 @@ p.n_runs = nRuns;
 p.endtime = endtime;
 p.foldedResults = foldedResults;
 p.init_states = initStatesFolded;
-
-p.title = strcat("VNS_stim_output_", string(floor((now-738000)*1000)));
-% (a general stem for for related plots etc. Therefore saved with data)
 p.runUnder = mfilename;
 p.finishedAt = datetime;
+p.title = strcat("VNS_stim_output_", string(floor((now-738000)*1000)));
+% (a general stem for for related plots etc. Therefore saved with data)
 
+% save in appropriate subfolder...
+save_dir = ['saved_output' filesep 'stim_chunker'];
+[~,~] = mkdir (save_dir);
+cd (save_dir)
 save(p.title,'p')
+cd ../..

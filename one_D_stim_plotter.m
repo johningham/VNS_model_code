@@ -62,11 +62,12 @@ s2.MarkerFaceColor = dotColour;
 ylim([0, 0.4])
 f2.Position = [700 100 900 200];
 
-
-% saveas(f1,strcat(p.title, 'Numb.png'))
-% saveas(f1,strcat(p.title, 'Numb.fig'))
-% saveas(f1,strcat(p.title, 'Numb.eps'))
-
-% saveas(f2,strcat(p.title, 'Pc.png'))
-% saveas(f2,strcat(p.title, 'Pc.fig'))
-% saveas(f2,strcat(p.title, 'Pc.eps'))
+% Save plots if flag set to true
+if savePlots
+    saveas(f1,strcat(p.title, 'Numb.png'))
+    saveas(f1,strcat(p.title, 'Numb.fig'))
+    saveas(f1,strcat(p.title, 'Numb.eps'))
+    saveas(f2,strcat(p.title, 'Pc.png'))
+    saveas(f2,strcat(p.title, 'Pc.fig'))
+    saveas(f2,strcat(p.title, 'Pc.eps'))
+end
