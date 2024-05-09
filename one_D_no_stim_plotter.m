@@ -6,20 +6,20 @@
 clear
 close all
 
-% set to "true" to save plots
+% set "true" to save plots
 savePlots = false;
-
-% set save path
-save_path = '/Users/john/Documents/VNS_output/no_stim_plotter';
 
 % load output file from which to draw plots... 
 load('VNS_no_stim_output_1146671.mat') % (as used in final paper)
 
-dotColour = [0.9290 0.6940 0.1250]; % (a kind of mustard yellow?)
+% ensure that we have the working directory matches the location of script
+cd(fileparts(mfilename("fullpath")))
 
 % Specify index of the noise scaler value to use (only one in this dataset)
 noiseIx = 1;
-    
+
+dotColour = [0.9290 0.6940 0.1250]; % (a kind of mustard yellow?)
+
 tot_timesteps = p.n_runs * p.nSteps; 
 ex_vals = p.ParamOneValues;
 in_vals = p.paramTwoValues;
@@ -64,16 +64,14 @@ f2.Position = [700 100 900 200];
 
 % Save plots if flag set to true
 if savePlots
+    save_dir = ['saved_output' filesep 'no_stim_plotter'];
+    [~,~] = mkdir (save_dir);
+    cd (save_dir)
     saveas(f1,strcat(p.title, 'Numb.png'))
     saveas(f1,strcat(p.title, 'Numb.fig'))
     saveas(f1,strcat(p.title, 'Numb.eps'))
     saveas(f2,strcat(p.title, 'Pc.png'))
     saveas(f2,strcat(p.title, 'Pc.fig'))
     saveas(f2,strcat(p.title, 'Pc.eps'))
+    cd(['..' filesep '..'])
 end
-
-save_dir = ['saved_output' filesep 'stim_chunker'];
-[~,~] = mkdir (save_dir);
-cd (save_dir)
-save(p.title,'p')
-cd ../..

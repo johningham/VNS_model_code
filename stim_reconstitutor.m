@@ -20,8 +20,8 @@ clear
 load('VNS_stim_output_1147915.mat') % data used in final paper
 
 % settings for plot and data saving
-savePlots = false;
-saveData = false;
+savePlots = true;
+saveData = true;
 
 % Choose from available param combinations and specify start time and
 % duration:
@@ -277,42 +277,23 @@ ylabel('S1 Py')
 xlabel('S1 Inh')
 
 % Show Limit Cycle in with red dashed line
-load('shortCleanSeries.mat') 
+load('shortCleanSeries.mat')
 % (presaved segment of LC under our standard conditions, with no noise and
 % no VNS)
 
 howFarRound = 3370;
 % (ensures dashed line not overdrawn by using only one period of LC)
 
-h3 = plot(clean_composite_series(1:howFarRound,1), clean_composite_series(1:howFarRound,2));
+h3 = plot(clean_composite_series(1:howFarRound,1), ...
+    clean_composite_series(1:howFarRound,2));
 h3.Color = [1,0,0,0.5];
 h3.LineWidth = 3;
 h3.LineStyle = ":";
 
 legend('','FP','LC', Location = 'northwest')
 
-%% Package data for optional save, and create title for optional data and
-% figure saves...
 
-q.noiseval = noiseScaler;
-q.w = p.w;
-q.h = p.h;
-q.a = p.a;
-q.b = p.b;
-q.epsilon = p.epsilon;
-q.tau = p.tau;
-q.dt = p.dt;
-q.windowSecs = p.windowSecs;
-q.threshold = p.threshold;
-q.eucWeights = p.eucWeights;
-q.noiseCHOICE = p.noiseCHOICE;
-q.endtime = p.endtime;
-q.n_runs = p.n_runs;
-q.title = strcat(p.title, '_from_', string(startStep), '_for_', ...
-    string(durStep), '_on_', string(Oix), '_', string(Tix), '_', ...
-    string(Nix), '_ts');
-
-% If required, save data...
+%% If required, save data...
 if saveData
     save_dir = ['saved_output' filesep 'reconstitutor' filesep 'data'];
     [~,~] = mkdir (save_dir);
@@ -344,9 +325,3 @@ if savePlots
     saveas(f4,strcat(q.title, '_phase.svg'))
     cd(['..' filesep '..' filesep '..'])
 end
-
-save_dir = ['saved_output' filesep 'stim_chunker'];
-[~,~] = mkdir (save_dir);
-cd (save_dir)
-save(p.title,'p')
-cd ../..

@@ -10,15 +10,16 @@ close all
 % set "true" to save plots
 savePlots = false;
 
-% set save path ******
-
 % load output file from which to draw plots... 
 load('VNS_stim_output_1147915.mat') % (as used in final paper)
 
-dotColour = [0.6350 0.0780 0.1840]; % (sort of maroon?)
+% ensure that we have the working directory matches the location of script
+cd(fileparts(mfilename("fullpath")))
 
 % Specify index of the noise scaler value to use (only one in this dataset)
 noiseIx = 1;
+
+dotColour = [0.6350 0.0780 0.1840]; % (sort of maroon?)
     
 tot_timesteps = p.n_runs * p.nSteps; 
 ex_vals = p.stimExVals;
@@ -64,10 +65,14 @@ f2.Position = [700 100 900 200];
 
 % Save plots if flag set to true
 if savePlots
+    save_dir = ['saved_output' filesep 'stim_plotter'];
+    [~,~] = mkdir (save_dir);
+    cd (save_dir)
     saveas(f1,strcat(p.title, 'Numb.png'))
     saveas(f1,strcat(p.title, 'Numb.fig'))
     saveas(f1,strcat(p.title, 'Numb.eps'))
     saveas(f2,strcat(p.title, 'Pc.png'))
     saveas(f2,strcat(p.title, 'Pc.fig'))
     saveas(f2,strcat(p.title, 'Pc.eps'))
+    cd(['..' filesep '..'])
 end
