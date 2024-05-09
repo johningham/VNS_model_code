@@ -26,6 +26,9 @@ demo_mode = true;
 % generation. (WARNING! As set up here, this will generate 441 composite 
 % plots, taking considerable time to do so.)
 
+% ensure that we have the working directory matches the location of script
+cd(fileparts(mfilename("fullpath")))
+
 % Specify/create the path into which the final composite figures and 
 % their constituent parts should be saved. (Additional structure is 
 % automatically created below this level in order to keep the output 

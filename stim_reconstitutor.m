@@ -17,11 +17,14 @@
 close all
 clear
 
+% ensure that we have the working directory matches the location of script
+cd(fileparts(mfilename("fullpath")))
+
 load('VNS_stim_output_1147915.mat') % data used in final paper
 
 % settings for plot and data saving
-savePlots = true;
-saveData = true;
+savePlots = false;
+saveData = false;
 
 % Choose from available param combinations and specify start time and
 % duration:

@@ -9,14 +9,14 @@ close all
 % set "true" to save plots
 savePlots = false;
 
+% Specify index of the noise scaler value to use (only one in this dataset)
+noiseIx = 1;
+
 % load output file from which to draw plots... 
 load('VNS_no_stim_output_1146671.mat') % (as used in final paper)
 
 % ensure that we have the working directory matches the location of script
 cd(fileparts(mfilename("fullpath")))
-
-% Specify index of the noise scaler value to use (only one in this dataset)
-noiseIx = 1;
 
 dotColour = [0.9290 0.6940 0.1250]; % (a kind of mustard yellow?)
 

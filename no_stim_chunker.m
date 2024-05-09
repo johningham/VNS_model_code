@@ -18,8 +18,11 @@
 close all
 clear
 
+% ensure that we have the working directory matches the location of script
+cd(fileparts(mfilename("fullpath")))
+
 % can set number of parallel cores if using parallelisation
-% parpool(4)
+parpool(4)
 
 tic
 
