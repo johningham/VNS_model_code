@@ -17,7 +17,7 @@
 close all
 clear
 
-load('VNS_stim_output_1147915.mat') % data for use in final paper
+load('VNS_stim_output_1147915.mat') % data used in final paper
 
 % settings for plot and data saving
 savePlots = false;
@@ -314,11 +314,18 @@ q.title = strcat(p.title, '_from_', string(startStep), '_for_', ...
 
 % If required, save data...
 if saveData
- save(q.title,'q')
+    save_dir = ['saved_output' filesep 'reconstitutor' filesep 'data'];
+    [~,~] = mkdir (save_dir);
+    cd (save_dir)
+    save(q.title,'q')
+    cd(['..' filesep '..' filesep '..'])
 end
 
 % ...and plots
 if savePlots
+    save_dir = ['saved_output' filesep 'reconstitutor' filesep 'plots'];
+    [~,~] = mkdir (save_dir);
+    cd (save_dir)
     saveas(f1,strcat(q.title, '.png'))
     saveas(f1,strcat(q.title, '.fig'))
     saveas(f1,strcat(q.title, '.eps'))
@@ -335,4 +342,11 @@ if savePlots
     saveas(f4,strcat(q.title, '_phase.fig'))
     saveas(f4,strcat(q.title, '_phase.eps'))
     saveas(f4,strcat(q.title, '_phase.svg'))
+    cd(['..' filesep '..' filesep '..'])
 end
+
+save_dir = ['saved_output' filesep 'stim_chunker'];
+[~,~] = mkdir (save_dir);
+cd (save_dir)
+save(p.title,'p')
+cd ../..

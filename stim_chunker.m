@@ -372,4 +372,4 @@ save_dir = ['saved_output' filesep 'stim_chunker'];
 [~,~] = mkdir (save_dir);
 cd (save_dir)
 save(p.title,'p')
-cd ../..
+cd(['..' filesep '..'])

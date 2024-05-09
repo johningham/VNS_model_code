@@ -265,4 +265,3 @@ for wix = 1:length(weights) % (everything goes inside this loop!)
         end
     end
 end
-

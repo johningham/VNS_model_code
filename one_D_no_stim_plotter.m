@@ -10,7 +10,7 @@ close all
 savePlots = false;
 
 % set save path
-save_path = '/Users/john/Documents/VNS_output/composite_bifurc_figs';
+save_path = '/Users/john/Documents/VNS_output/no_stim_plotter';
 
 % load output file from which to draw plots... 
 load('VNS_no_stim_output_1146671.mat') % (as used in final paper)
@@ -71,3 +71,9 @@ if savePlots
     saveas(f2,strcat(p.title, 'Pc.fig'))
     saveas(f2,strcat(p.title, 'Pc.eps'))
 end
+
+save_dir = ['saved_output' filesep 'stim_chunker'];
+[~,~] = mkdir (save_dir);
+cd (save_dir)
+save(p.title,'p')
+cd ../..
