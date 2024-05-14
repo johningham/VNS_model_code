@@ -23,7 +23,7 @@
 % 
 % The code can be parallelised (performing runs for more than parameter set 
 % at a time) with MATLAB Parallel Toolbox. If not using this, change the 
-% "parfor" loop, on line 226, to a "for" loop.
+% "parfor" loop, on line 229, to a "for" loop.
 
 close all
 clear
