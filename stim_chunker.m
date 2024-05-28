@@ -23,16 +23,25 @@
 % 
 % The code can be parallelised (performing runs for more than parameter set 
 % at a time) with MATLAB Parallel Toolbox. If not using this, change the 
-% "parfor" loop, on line 229, to a "for" loop.
+% "parfor" loop, on line 239, to a "for" loop.
+
+% THIS CODE WILL TAKE HOURS TO RUN AS CURRENTLY SET UP (AS IN THE PAPER)!
 
 close all
 clear
 
 % ensure that we have the working directory matches the location of script
-cd(fileparts(mfilename("fullpath")))
+main_folder = fileparts(which(mfilename));
+cd(main_folder)
+
+% add all subdirectories to the path
+addpath(genpath(main_folder))
 
 % can set number of parallel cores if using parallelisation
-parpool(4)
+if not(isempty(gcp('nocreate'))) 
+    delete(gcp('nocreate'));
+end
+parpool(4);
 
 tic
 
@@ -51,8 +60,9 @@ baseEx = -0.9;
 baseIn = -0.7;
 
 % set number of epochs
-nRuns = 100; % what was used for the examples in the paper.
-% nRuns = 1; % to run quickly for testing
+nRuns = 100; % what was used for the examples in the paper. THIS WILL TAKE HOURS!
+% nRuns = 1; % to run quickly for testing. (Nothing very interesting will 
+% be produced though...)
 
 endtime = 100; % (simulated seconds for each section of epoch)  
 % (NOTE cannot compare runs runs where sections are different lengths as 

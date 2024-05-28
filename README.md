@@ -18,6 +18,9 @@ This code will run a series of stochastic simulations, for different combination
 Due to RAM constraints, continuous runs are divided into epochs, each starting with a consecutive noise seed. The output of this code is stored in a compact format as arrays of tuples of varying length, recording the the starting timestep (for entire run) and duration of each seizure event, as well as the initial conditions. From this we can calculate seizure frequency and duration also reconstitute sections of the time series of interest. By default, the code is parallelised (performing runs for more than parameter set at a time) with MATLAB Parallel Toolbox. If not using this, change the "parfor" loop on line 201 to a "for" loop.
 
 
+THIS CODE WILL TAKE HOURS TO RUN AS CURRENTLY SET UP (AS IN THE PAPER)!
+
+
 **stim_chunker.m**
 
 For fixed background input to NTS populations, and with other parameters also fixed, this code will run a series of stochastic simulations, using the same noise series, for different VNS amplitudes. There is a great deal of duplicated code from 'no_stim_chunker.m'. It is possible to apply combinations of different stimulation levels for both the excitatory and inhibitory populations, although the example given here has all the stimulation applied to the excitatory population of NTS, as was done for the examples in the paper.  
@@ -25,6 +28,8 @@ For fixed background input to NTS populations, and with other parameters also fi
 Due to RAM constraints, continuous runs are divided into epochs, each starting with a consecutive noise seed. The output of this code is stored in a compact format as arrays of tuples of varying length, recording the the starting timestep (for entire run) and duration of each seizure event, as well as the initial conditions. From these we can calculate seizure frequency and duration also reconstitute sections of the time series of interest. 
 
 VNS is modelled as an idealised square wave, for which pulse width and frequency can be specified. At any given point, VNS is calculated as a function of the current time step for the whole run. This is added to the NTS excitatory and inhibitory populations. To this end, the solver needs to be given overall time step of the whole simulation. By default, the code is parallelised (performing runs for more than parameter set at a time) with MATLAB Parallel Toolbox. If not using this, change the "parfor" loop, on line 229, to a "for" loop.
+
+THIS CODE WILL TAKE HOURS TO RUN AS CURRENTLY SET UP (AS IN THE PAPER)!
 
 
 **stim_reconstitutor.m**

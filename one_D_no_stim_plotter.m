@@ -6,6 +6,13 @@
 clear
 close all
 
+% ensure that we have the working directory matches the location of script
+main_folder = fileparts(which(mfilename));
+cd(main_folder)
+
+% add all subdirectories to the path
+addpath(genpath(main_folder))
+
 % set "true" to save plots
 savePlots = false;
 
@@ -14,9 +21,6 @@ noiseIx = 1;
 
 % load output file from which to draw plots... 
 load('VNS_no_stim_output_1146671.mat') % (as used in final paper)
-
-% ensure that we have the working directory matches the location of script
-cd(fileparts(mfilename("fullpath")))
 
 dotColour = [0.9290 0.6940 0.1250]; % (a kind of mustard yellow?)
 

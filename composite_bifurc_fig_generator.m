@@ -27,7 +27,11 @@ demo_mode = true;
 % plots, taking considerable time to do so.)
 
 % ensure that we have the working directory matches the location of script
-cd(fileparts(mfilename("fullpath")))
+main_folder = fileparts(which(mfilename));
+cd(main_folder)
+
+% add all subdirectories to the path
+addpath(genpath(main_folder))
 
 % Specify/create the path into which the final composite figures and 
 % their constituent parts should be saved. (Additional structure is 

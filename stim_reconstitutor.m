@@ -18,7 +18,11 @@ close all
 clear
 
 % ensure that we have the working directory matches the location of script
-cd(fileparts(mfilename("fullpath")))
+main_folder = fileparts(which(mfilename));
+cd(main_folder)
+
+% add all subdirectories to the path
+addpath(genpath(main_folder))
 
 load('VNS_stim_output_1147915.mat') % data used in final paper
 
